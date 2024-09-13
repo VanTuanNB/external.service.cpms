@@ -1,3 +1,5 @@
+console.log('process', process.env);
+console.log('process.env.NODE_ENV', process.env.NODE_ENV);
 export const environment = {
     MONGO_HOST_NAME: Bun.env.MONGO_HOST_NAME || 'mongo',
     MONGO_PORT: Bun.env.MONGO_PORT || 27017,
