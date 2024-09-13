@@ -4,9 +4,7 @@ import express from 'express';
 import 'reflect-metadata';
 
 import '@/core/configs/moment-timezone.config';
-import { APP_PATH } from '@/core/constants/common.constant';
 import Database from './database/connect.database';
-import rootRouter from './routes/index.route';
 
 const app = express();
 const port: number = Number(process.env.PORT) || 5000;
@@ -28,7 +26,10 @@ app.use(
 );
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(APP_PATH, rootRouter);
+// app.use(APP_PATH, rootRouter);
+app.get('/', (req, res) => {
+    res.send('Hello, World!');
+});
 
 Database.connect()
     .then(() => {
