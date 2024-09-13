@@ -17,6 +17,7 @@
         "@types/jsonwebtoken": "^9.0.6",
         "@types/nodemailer": "^6.4.15",
         "@types/uuid": "^9.0.8",
+        "@types/web": "^0.0.162",
         "tsc-alias": "^1.8.8"
     },
     "peerDependencies": {

@@ -8,7 +8,7 @@ import Database from './database/connect.database';
 
 const app = express();
 const port: number = Number(process.env.PORT) || 5000;
-const whitelist = ['http://localhost:4209', 'http://localhost:5000'];
+const whitelist = ['http://localhost:4209', 'https://service-cpms.vercel.app'];
 app.use(
     cors((req, callback) => {
         const corsOptions = { origin: false };

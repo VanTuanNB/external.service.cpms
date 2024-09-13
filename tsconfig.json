@@ -1,7 +1,7 @@
 {
     "compilerOptions": {
         "baseUrl": ".",
-        "lib": ["ESNext"],
+        "lib": ["ESNext", "DOM", "DOM.Iterable"],
         "target": "ESNext",
         "module": "ESNext",
         "moduleDetection": "force",
@@ -28,7 +28,7 @@
         "paths": {
             "@/*": ["./src/*"]
         },
-        "types": ["bun-types"]
+        "types": ["web", "bun-types"]
     },
     "include": ["src"]
 }
