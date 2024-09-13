@@ -1,7 +1,7 @@
 import cors from 'cors';
-import 'es6-shim';
+// import 'es6-shim';
 import express from 'express';
-import 'reflect-metadata';
+// import 'reflect-metadata';
 
 // import '@/core/configs/moment-timezone.config';
 // import Database from './database/connect.database';

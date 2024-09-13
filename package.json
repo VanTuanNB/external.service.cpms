@@ -7,7 +7,7 @@
         "start": "bun --env-file=.env ./dist/index.js",
         "docker-build": "sudo docker build --pull -t external.services.cpms-docker-server .",
         "docker-run": "sudo docker run -d -p 3000:3000 external.services.cpms-docker-server",
-        "build": "bun build ./src/index.ts --outdir ./dist --target=bun",
+        "build": "bun build ./src/index.ts --outdir ./dist --target=node",
         "test": "bun test --preload ./src/index.ts",
         "production": "bun --env-file=.env --watch ./dist/index.js"
     },
