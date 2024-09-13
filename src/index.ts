@@ -4,7 +4,7 @@ import express from 'express';
 import 'reflect-metadata';
 
 // import '@/core/configs/moment-timezone.config';
-import Database from './database/connect.database';
+// import Database from './database/connect.database';
 
 const app = express();
 const port: number = Number(process.env.PORT) || 5000;
@@ -31,12 +31,15 @@ app.get('/', (req, res) => {
     res.send('Hello, World!');
 });
 
-Database.connect()
-    .then(() => {
-        app.listen(port, () => {
-            console.log(`Listening on port ${port}`);
-        });
-    })
-    .catch((err) => {
-        console.log(err);
-    });
+// Database.connect()
+//     .then(() => {
+//         app.listen(port, () => {
+//             console.log(`Listening on port ${port}`);
+//         });
+//     })
+//     .catch((err) => {
+//         console.log(err);
+//     });
+app.listen(port, () => {
+    console.log(`Listening on port ${port}`);
+});

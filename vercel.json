@@ -1,18 +1,16 @@
 {
     "version": 2,
+    "devCommand": "bun run production",
     "builds": [
         {
-            "src": "src/index.ts",
-            "use": "@vercel/node",
-            "config": {
-                "zeroConfig": true
-            }
+            "src": "/dist/index.js",
+            "use": "@vercel/node"
         }
     ],
     "routes": [
         {
             "src": "/(.*)",
-            "dest": "/"
+            "dest": "/dist/index.js"
         }
     ]
 }
