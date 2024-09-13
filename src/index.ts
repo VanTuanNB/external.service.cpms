@@ -30,7 +30,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(APP_PATH, rootRouter);
 app.get('/', (req, res) => {
-    res.send('Hello, World!');
+    return res.json(process.env);
+});
+app.get('/bun', (req, res) => {
+    return res.json(Bun.env);
 });
 
 Database.connect()
