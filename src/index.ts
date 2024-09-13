@@ -3,7 +3,7 @@ import 'es6-shim';
 import express from 'express';
 import 'reflect-metadata';
 
-import '@/core/configs/moment-timezone.config';
+// import '@/core/configs/moment-timezone.config';
 import Database from './database/connect.database';
 
 const app = express();
