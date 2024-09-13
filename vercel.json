@@ -1,6 +1,7 @@
 {
     "version": 2,
     "devCommand": "bun run production",
+    "rewrites": [{ "source": "/(.*)", "destination": "/api" }],
     "builds": [
         {
             "src": "/dist/index.js",
@@ -9,7 +10,7 @@
     ],
     "routes": [
         {
-            "src": "/(.*)",
+            "src": "/api",
             "dest": "/dist/index.js"
         }
     ]
