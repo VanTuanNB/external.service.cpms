@@ -57,3 +57,50 @@ export class CreateFacultyFilterModel implements Partial<IPayloadCreateFaculty> 
         this.courseIds = payload.courseIds;
     }
 }
+
+
+// region update
+
+export type IPayloadUpdateFaculty = Omit<IFacultyEntity, 'courses' | 'curriculum' | 'createdAt' | 'updatedAt'> & {
+    courseIds: string[];
+    curriculumId: string;
+};
+
+export class UpdateFacultyFilterModel implements Partial<IPayloadUpdateFaculty> {
+    @IsNotEmpty()
+    title?: string;
+
+    @IsString()
+    @IsNotEmpty()
+    code?: string;
+
+    @IsString()
+    @IsNotEmpty()
+    description?: string;
+
+    @IsString()
+    @IsNotEmpty()
+    durationStart?: string;
+
+    @IsString()
+    @IsNotEmpty()
+    durationEnd?: string;
+
+    @IsArray()
+    @IsNotEmpty()
+    courseIds?: string[];
+
+    @IsString()
+    @IsNotEmpty()
+    curriculumId?: string;
+
+    constructor(payload: Partial<IPayloadUpdateFaculty>) {
+        this.title = payload.title;
+        this.description = payload.description;
+        this.code = payload.code;
+        this.durationStart = payload.durationStart;
+        this.durationEnd = payload.durationEnd;
+        this.courseIds = payload.courseIds;
+        this.curriculumId = payload.curriculumId;
+    }
+}
