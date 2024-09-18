@@ -14,7 +14,8 @@ export class JWTHelper {
         return jwt.sign(payload, signature, options);
     }
 
-    public verifyToken<T = any>(token: string): T {
-        return {} as T;
+    public verifyToken(token: string, secretKey = environment.AUTH_PRIVATE_KEY || ''): string | jwt.JwtPayload {
+        const jwtPayload = jwt.verify(token, secretKey);
+        return jwtPayload;
     }
 }

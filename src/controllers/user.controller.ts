@@ -1,7 +1,13 @@
 import { EModePayload, Required } from '@/core/decorators/validate.decorator';
+import type { RequestAuthorized } from '@/core/interfaces/common.interface';
 import { UserService } from '@/services/user.service';
 import type { Request, Response } from 'express';
-import { CreateUserFilterModel, GetInfoUserFilterModel } from './filters/user.filter';
+import {
+    CourseRegisterFilterModel,
+    GetInfoUserFilterModel,
+    UserAcceptCourseRegisterFilterModel,
+    UserCourseRegisterFilterModel,
+} from './filters/user.filter';
 
 export default class UserController {
     private userService = new UserService();
@@ -18,14 +24,26 @@ export default class UserController {
         return res.status(result.status).json(result);
     }
 
-    @Required(CreateUserFilterModel)
-    public async create(req: Request, res: Response): Promise<Response> {
-        const result = await this.userService.create(req.body);
+    @Required(UserCourseRegisterFilterModel)
+    public async registerCourse(req: RequestAuthorized, res: Response): Promise<Response> {
+        const result = await this.userService.registerCourse(Object.assign(req.body, { userId: req.user?.id }));
+        return res.status(result.status).json(result);
+    }
+
+    @Required(UserAcceptCourseRegisterFilterModel)
+    public async acceptRegisterCourse(req: RequestAuthorized, res: Response): Promise<Response> {
+        const result = await this.userService.acceptRegisterCourse(Object.assign(req.body));
+        return res.status(result.status).json(result);
+    }
+
+    @Required(UserCourseRegisterFilterModel)
+    public async completeCourse(req: RequestAuthorized, res: Response): Promise<Response> {
+        const result = await this.userService.completeCourse(Object.assign(req.body));
         return res.status(result.status).json(result);
     }
 
     @Required(GetInfoUserFilterModel, EModePayload.PARAMS)
-    @Required(CreateUserFilterModel)
+    @Required(CourseRegisterFilterModel)
     public async update(req: Request, res: Response): Promise<Response> {
         const payload = Object.assign(req.body, req.params);
         const result = await this.userService.update(payload);

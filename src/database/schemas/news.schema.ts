@@ -5,7 +5,9 @@ import type { INewsEntity } from '../entities/news.entity';
 const newsSchema = new Schema<INewsEntity & { _id: string }>(
     {
         _id: { type: String, required: true },
+        title: { type: String, required: true },
         contents: { type: String, required: true },
+        description: { type: String, default: '' },
         createdAt: { type: String, default: moment().format() },
         updatedAt: { type: String, default: moment().format() },
     },

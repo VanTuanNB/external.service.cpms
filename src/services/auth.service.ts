@@ -18,11 +18,9 @@ export class AuthService {
         payload: Pick<IUserEntity, 'email' | 'password' | 'name' | 'birthday' | 'phone' | 'address'>,
     ): Promise<IResponseServer> {
         try {
-            const account = await this.userRepository.checkUserExists(payload.email);
+            const account = await this.userRepository.getByEmail(payload.email);
             if (account) {
-                return new ResponseHandler(200, true, 'User exits', {
-                    userId: account._id,
-                });
+                return new ResponseHandler(200, true, 'User exits', payload);
             }
             const id = uuidV4();
             const hashPassword = await bcrypt.hash(payload.password, 10);
@@ -32,7 +30,7 @@ export class AuthService {
                 id: id,
                 email: payload.email,
                 name: payload.name,
-                role: userRole.role,
+                roles: [userRole.role],
             });
             const newUser = new UserModel({
                 id,
@@ -73,12 +71,21 @@ export class AuthService {
             const isPasswordMatched = await bcrypt.compare(payload.password, user.password);
             if (!isPasswordMatched)
                 return new ResponseHandler(401, false, 'Authentication Failed', null, `Incorrect email or password`);
-
+            const roleRecords = await this.roleRepository.getMultipleById(user.roles);
+            if (!roleRecords || !roleRecords.length)
+                return new ResponseHandler(
+                    404,
+                    false,
+                    'Role not found',
+                    null,
+                    `The requested user with email "${payload.email}" have role dose not exist in the system.`,
+                );
+            const roleEnums = roleRecords.map((role) => role.role);
             const { accessToken, refreshToken } = this.jwtHelper.generatePairToken({
                 id: user.id,
                 email: user.email,
                 name: user.name,
-                role: user.roles,
+                roles: roleEnums,
             });
             const updatedUser = await this.userRepository.update(Object.assign(user, { refreshToken }));
             if (!updatedUser) ResponseHandler.InternalServer();

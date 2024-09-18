@@ -1,12 +1,23 @@
-import type { IPayloadUpdateCurriculum } from '@/controllers/filters/curriculum.filter';
-import type { IPayloadCreateUser } from '@/controllers/filters/user.filter';
+import type { IPayloadUpdateUser, IPayloadUserRegisterCourse } from '@/controllers/filters/user.filter';
+import { EnumUserCourseStatus } from '@/core/constants/common.constant';
 import { ValidatorInput } from '@/core/helpers/class-validator.helper';
 import { ResponseHandler } from '@/core/helpers/response-handler.helper';
 import type { IResponseServer } from '@/core/interfaces/common.interface';
+import { CoursesRegistering } from '@/database/entities/course-register.entity';
+import { UserCourseModel } from '@/database/entities/user-course.entity';
+import { UserModel } from '@/database/entities/user.entity';
+import { CourseRegisterRepository } from '@/repositories/course-register.repository';
+import { CourseRepository } from '@/repositories/course.repository';
+import { UserCourseRepository } from '@/repositories/user-course.repository';
 import { UserRepository } from '@/repositories/user.repository';
+import moment from 'moment-timezone';
+import { v4 as uuidV4 } from 'uuid';
 
 export class UserService {
     private userRepository = new UserRepository();
+    private courseRegisterRepository = new CourseRegisterRepository();
+    private userCourseRepository = new UserCourseRepository();
+    private courseRepository = new CourseRepository();
     private validateInputService = new ValidatorInput();
     constructor() {}
 
@@ -22,114 +33,173 @@ export class UserService {
 
     public async getById(id: string): Promise<IResponseServer> {
         try {
-            const curriculumRecord = await this.userRepository.getById(id);
-            return new ResponseHandler(200, true, 'Get user information successfully', curriculumRecord);
+            const user = await this.userRepository.getById(id);
+            if (!user) return new ResponseHandler(404, false, 'User not found', null);
+            return new ResponseHandler(200, true, 'Get user information successfully', user);
         } catch (error) {
             console.log('error', error);
             return ResponseHandler.InternalServer();
         }
     }
 
-    public async create(payload: IPayloadCreateUser): Promise<IResponseServer> {
+    public async registerCourse(payload: IPayloadUserRegisterCourse): Promise<IResponseServer> {
         try {
-            const curriculumRecord = await this.userRepository.getByEmail(payload.email);
-            if (curriculumRecord) {
-                return new ResponseHandler(200, true, 'User is exits', curriculumRecord);
+            const courseRegisterRecord = await this.courseRegisterRepository.getMetadataQuery({
+                updateCondition: { user: payload.userId, course: { $in: payload.courseIds } },
+                updateQuery: {},
+            });
+            if (courseRegisterRecord)
+                return new ResponseHandler(400, true, 'Course registration is exits', courseRegisterRecord);
+            const courseRecords = await this.courseRepository.getMetadataManyRecordQuery({
+                updateCondition: { _id: { $in: payload.courseIds }, quantity: { $gt: 0 } },
+                updateQuery: {},
+            });
+            if (!courseRecords.length)
+                return new ResponseHandler(
+                    400,
+                    false,
+                    'The number of participants for this course has reached its limit, please wait for further processing',
+                    null,
+                );
+            const courseIds = courseRecords.map((course) => course.id);
+            const newRecords = courseIds.map(
+                (course) =>
+                    new CoursesRegistering({
+                        id: uuidV4(),
+                        user: payload.userId,
+                        course: course,
+                    }),
+            );
+            const newCurriculumRecords = await this.courseRegisterRepository.insertMultiple(newRecords);
+            if (!newCurriculumRecords) return new ResponseHandler(500, false, 'Can not create new curriculum', null);
+            const userRecordUpdated = await this.userRepository.updateRecord({
+                updateCondition: { _id: payload.userId },
+                updateQuery: {
+                    $addToSet: { coursesRegistering: { $each: courseIds } },
+                },
+            });
+            return new ResponseHandler(201, true, 'Create new course register successfully', userRecordUpdated);
+        } catch (error) {
+            console.log('error', error);
+            return ResponseHandler.InternalServer();
+        }
+    }
+
+    public async acceptRegisterCourse(payload: IPayloadUserRegisterCourse): Promise<IResponseServer> {
+        try {
+            const courseRegisterRecord = await this.courseRegisterRepository.getMetadataManyRecordQuery({
+                updateCondition: { user: payload.userId, course: { $in: payload.courseIds } },
+                updateQuery: {},
+            });
+            if (!courseRegisterRecord.length)
+                return new ResponseHandler(400, true, 'Course registration not is exits', courseRegisterRecord);
+
+            const userCourseRecords = courseRegisterRecord.map(
+                (record) =>
+                    new UserCourseModel({
+                        id: uuidV4(),
+                        user: record.user,
+                        course: record.course,
+                        status: EnumUserCourseStatus.PROCESSING,
+                    }),
+            );
+            const newUserCourseRecords = await this.userCourseRepository.insertMultiple(userCourseRecords);
+            if (!newUserCourseRecords)
+                return new ResponseHandler(500, false, 'Can not create new course register', null);
+            const userUpdated = await this.userRepository.updateRecord({
+                updateCondition: { _id: payload.userId },
+                updateQuery: {
+                    $addToSet: { courses: payload.courseIds },
+                    $pull: { coursesRegistering: { $in: payload.courseIds } },
+                },
+            });
+            if (!userUpdated) return new ResponseHandler(500, false, 'Can not accept course for this user', null);
+            await this.courseRegisterRepository.permanentlyDeleteMultiple(
+                courseRegisterRecord.map((record) => record.id),
+            );
+            return new ResponseHandler(201, true, 'Create new course register successfully', userUpdated);
+        } catch (error) {
+            console.log('error', error);
+            return ResponseHandler.InternalServer();
+        }
+    }
+
+    public async completeCourse(payload: IPayloadUserRegisterCourse): Promise<IResponseServer> {
+        try {
+            const courseRegisterRecord = await this.courseRegisterRepository.getMetadataManyRecordQuery({
+                updateCondition: { user: payload.userId, course: { $in: payload.courseIds } },
+                updateQuery: {},
+            });
+            if (!courseRegisterRecord.length)
+                return new ResponseHandler(400, true, 'Course registration not is exits', courseRegisterRecord);
+            const courseRegisterRecordUpdated = await this.courseRegisterRepository.updateRecord({
+                updateCondition: { user: payload.userId, course: { $in: payload.courseIds } },
+                updateQuery: {
+                    $set: {
+                        status: EnumUserCourseStatus.COMPLETED,
+                    },
+                },
+            });
+            return new ResponseHandler(
+                201,
+                true,
+                'Create new course register successfully',
+                courseRegisterRecordUpdated,
+            );
+        } catch (error) {
+            console.log('error', error);
+            return ResponseHandler.InternalServer();
+        }
+    }
+
+    public async update(payload: IPayloadUpdateUser): Promise<IResponseServer> {
+        try {
+            const userRecord = await this.userRepository.getById(payload.id);
+            if (!userRecord) {
+                return new ResponseHandler(404, true, 'User not found', userRecord);
             }
-            // let facultyIds: string[] = [];
-            // if (payload.facultyIds && payload.facultyIds.length) {
-            //     const faculties = await this.facultyRepository.getFacultiesMultipleId(payload.facultyIds);
-            //     facultyIds = faculties.map((faculty) => faculty.id);
+            // let courseIds: string[] = [];
+            // if (payload.courseIds && payload.courseIds.length) {
+            //     const courses = await this.courseRepository.getCourseMultipleId(payload.courseIds);
+            //     courseIds = courses.map((course) => course.id);
             // }
-            // const id = uuidV4();
-            // const newCurriculum = new CurriculumModel({
-            //     id,
-            //     title: payload.title.trim(),
-            //     description: payload.description?.trim(),
-            //     code: payload.code.trim(),
-            //     faculties: facultyIds,
-            //     durationStart: payload.durationStart,
-            //     durationEnd: payload.durationEnd,
-            // });
-            // const validation = await this.validateInputService.validate(newCurriculum);
-            // if (validation) return validation;
-            // if (newCurriculum.faculties.length) {
-            //     await this.curriculumRepository.updateManyRecord({
-            //         updateCondition: { _id: { $nin: newCurriculum.id } },
-            //         updateQuery: {
-            //             $pull: { faculties: { $in: newCurriculum.faculties } },
-            //         },
-            //     });
+            // let coursesRegistering: string[] = [];
+            // if (payload.courseRegisteringIds && payload.courseRegisteringIds.length) {
+            //     const coursesRegister = await this.courseRegisterRepository.getCourseMultipleId(
+            //         payload.courseRegisteringIds,
+            //     );
+            //     coursesRegistering = coursesRegister.map((course) => course.id);
             // }
-            // const newCurriculumRecord = await this.curriculumRepository.create(newCurriculum);
-            // if (!newCurriculumRecord) return new ResponseHandler(500, false, 'Can not create new curriculum', null);
-            return new ResponseHandler(201, true, 'Create new curriculum successfully', null);
-        } catch (error) {
-            console.log('error', error);
-            return ResponseHandler.InternalServer();
-        }
-    }
-
-    public async update(payload: IPayloadUpdateCurriculum): Promise<IResponseServer> {
-        try {
-            // const curriculumRecord = await this.curriculumRepository.getById(payload.id);
-            // if (!curriculumRecord) {
-            //     return new ResponseHandler(404, true, 'Curriculum not found', curriculumRecord);
-            // }
-            // let facultyIds: string[] = [];
-            // if (payload.facultyIds && payload.facultyIds.length) {
-            //     const faculties = await this.facultyRepository.getFacultiesMultipleId(payload.facultyIds);
-            //     facultyIds = faculties.map((faculty) => faculty.id);
-            // }
-            // const facultyIdsFiltered: string[] = curriculumRecord.faculties.filter(
-            //     (faculty) => !payload.facultyIds.includes(faculty),
-            // );
-            // const newCurriculum = new CurriculumModel({
-            //     id: payload.id,
-            //     title: payload.title.trim() || curriculumRecord.title,
-            //     description: payload.description?.trim() || curriculumRecord.title,
-            //     code: payload.code.trim() || curriculumRecord.code,
-            //     faculties: facultyIds,
-            //     durationStart: payload.durationStart || curriculumRecord.durationStart,
-            //     durationEnd: payload.durationEnd || curriculumRecord.durationEnd,
-            //     createdAt: curriculumRecord.createdAt,
-            //     updatedAt: moment().format(),
-            // });
-            // const validation = await this.validateInputService.validate(newCurriculum);
-            // if (validation) return validation;
-            // await this.curriculumRepository.updateManyRecord({
-            //     updateCondition: { _id: { $nin: newCurriculum.id } },
-            //     updateQuery: {
-            //         $pull: { faculties: { $in: newCurriculum.faculties } },
-            //     },
-            // });
-            // let curriculumRecordUpdated: ICurriculumEntity | null = null;
-            // curriculumRecordUpdated = await this.curriculumRepository.updateRecord({
-            //     updateCondition: { _id: newCurriculum.id },
-            //     updateQuery: {
-            //         $set: {
-            //             title: newCurriculum.title,
-            //             description: newCurriculum.description,
-            //             code: newCurriculum.code,
-            //             durationStart: newCurriculum.durationStart,
-            //             durationEnd: newCurriculum.durationEnd,
-            //             updatedAt: newCurriculum.updatedAt,
-            //             createdAt: newCurriculum.createdAt,
-            //         },
-            //         $addToSet: { faculties: { $each: newCurriculum.faculties } },
-            //     },
-            // });
-            // if (facultyIdsFiltered.length) {
-            //     curriculumRecordUpdated = await this.curriculumRepository.updateRecord({
-            //         updateCondition: { _id: newCurriculum.id },
-            //         updateQuery: {
-            //             $pull: { faculties: { $in: facultyIdsFiltered } },
-            //         },
-            //     });
-            // }
-            // if (!curriculumRecordUpdated) return new ResponseHandler(500, false, 'Can not update curriculum', null);
-            // return new ResponseHandler(200, true, 'Update curriculum successfully', curriculumRecordUpdated);
-            return new ResponseHandler(200, true, 'Update curriculum successfully', payload);
+            const newRecord = new UserModel({
+                id: payload.id,
+                email: payload.email.trim(),
+                name: payload.name.trim(),
+                birthday: payload.birthday,
+                password: userRecord.password,
+                address: payload.address?.trim(),
+                phone: payload.phone?.trim(),
+                roles: userRecord.roles,
+                refreshToken: userRecord.refreshToken,
+                updatedAt: moment().format(),
+            });
+            const validation = await this.validateInputService.validate(newRecord);
+            if (validation) return validation;
+            const userRecordUpdated = await this.userRepository.updateRecord({
+                updateCondition: { _id: newRecord.id },
+                updateQuery: {
+                    $set: {
+                        email: newRecord.email,
+                        name: newRecord.name,
+                        birthday: newRecord.birthday,
+                        address: newRecord.address,
+                        phone: newRecord.phone,
+                        roles: newRecord.roles,
+                        updatedAt: newRecord.updatedAt,
+                    },
+                },
+            });
+            if (!userRecordUpdated) return new ResponseHandler(500, false, 'Can not update user', null);
+            return new ResponseHandler(200, true, 'Update curriculum successfully', userRecordUpdated);
         } catch (error) {
             console.log('error', error);
             return ResponseHandler.InternalServer();

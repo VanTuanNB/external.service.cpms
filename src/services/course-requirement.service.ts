@@ -30,6 +30,7 @@ export class CourseRequirementService {
     public async getById(id: string): Promise<IResponseServer> {
         try {
             const courseRequirementRecord = await this.courseRequirementRepository.getById(id);
+            if (!courseRequirementRecord) return new ResponseHandler(404, false, 'Course requirement not found', null);
             return new ResponseHandler(200, true, 'Get info course requirement successfully', courseRequirementRecord);
         } catch (error) {
             console.log('error', error);

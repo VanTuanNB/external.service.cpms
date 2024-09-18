@@ -23,6 +23,7 @@ export class SchoolService {
     public async getById(id: string): Promise<IResponseServer> {
         try {
             const schoolRecords = await this.schoolRepository.getById(id);
+            if (!schoolRecords) return new ResponseHandler(404, false, 'School not found', null);
             return new ResponseHandler(200, true, 'Get school successfully', schoolRecords);
         } catch (error) {
             console.log('error', error);

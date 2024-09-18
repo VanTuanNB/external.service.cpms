@@ -30,6 +30,7 @@ export class FacultyService {
     public async getById(id: string): Promise<IResponseServer> {
         try {
             const facultyRecords = await this.facultyRepository.getById(id);
+            if (!facultyRecords) return new ResponseHandler(404, false, 'Faculty not found', null);
             return new ResponseHandler(200, true, 'Get info faculty successfully', facultyRecords);
         } catch (error) {
             console.log('error', error);

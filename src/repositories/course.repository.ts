@@ -22,6 +22,14 @@ export class CourseRepository extends BaseRepository {
         return await courseSchema.findOne({ code });
     }
 
+    public async getMetadataQuery(options: TypeOptionUpdateRecord<ICourseEntity>): Promise<ICourseEntity | null> {
+        return await courseSchema.findOne(options.updateCondition, options.updateQuery);
+    }
+
+    public async getMetadataManyRecordQuery(options: TypeOptionUpdateRecord<ICourseEntity>): Promise<ICourseEntity[]> {
+        return await courseSchema.find(options.updateCondition, options.updateQuery);
+    }
+
     public async getRoleRecord(role: number): Promise<ICourseEntity | null> {
         return (await courseSchema.findOne({ role })) as any;
     }

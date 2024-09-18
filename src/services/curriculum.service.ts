@@ -28,6 +28,7 @@ export class CurriculumService {
     public async getById(id: string): Promise<IResponseServer> {
         try {
             const curriculumRecord = await this.curriculumRepository.getById(id);
+            if (!curriculumRecord) return new ResponseHandler(404, false, 'Curriculum not found', null);
             return new ResponseHandler(200, true, 'Get curriculum successfully', curriculumRecord);
         } catch (error) {
             console.log('error', error);

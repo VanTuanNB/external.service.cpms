@@ -12,6 +12,10 @@ export class RoleRepository extends BaseRepository {
         return await roleSchema.find().lean();
     }
 
+    public async getMultipleById(ids: string[]): Promise<IRoleEntity[]> {
+        return await roleSchema.find({ _id: ids });
+    }
+
     public async getById(id: string): Promise<IRoleEntity | null> {
         return await roleSchema.findById(id);
     }

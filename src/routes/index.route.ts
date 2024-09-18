@@ -5,6 +5,7 @@ import courseRequirement from './course-requirement.route';
 import courseRouter from './course.route';
 import curriculumRouter from './curriculum.route';
 import facultyRouter from './faculty.route';
+import newsRouter from './news.route';
 import roleRouter from './role.route';
 import schoolRouter from './school.route';
 import userRouter from './user.route';
@@ -19,6 +20,7 @@ rootRouter.use('/faculty', facultyRouter);
 rootRouter.use('/course', courseRouter);
 rootRouter.use('/course-requirement', courseRequirement);
 rootRouter.use('/user', userRouter);
+rootRouter.use('/news', newsRouter);
 
 rootRouter.use('*', new ExceptionController().endpointException);
 

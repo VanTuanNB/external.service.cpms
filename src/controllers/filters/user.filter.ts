@@ -1,5 +1,6 @@
+import type { ICourseRegisteringEntity } from '@/database/entities/course-register.entity';
 import type { IUserEntity } from '@/database/entities/user.entity';
-import { IsArray, IsEmail, IsNotEmpty, IsOptional, IsString, IsUUID, Min } from 'class-validator';
+import { IsArray, IsEmail, IsNotEmpty, IsString, IsUUID, MinLength } from 'class-validator';
 
 export class GetInfoUserFilterModel implements Partial<IUserEntity> {
     @IsUUID()
@@ -11,15 +12,12 @@ export class GetInfoUserFilterModel implements Partial<IUserEntity> {
     }
 }
 
-export type IPayloadCreateUser = Omit<
+export type IPayloadUpdateUser = Omit<
     IUserEntity,
     'courses' | 'roles' | 'coursesRegistering' | 'createdAt' | 'refreshToken' | 'updatedAt'
-> & {
-    courseIds: string[];
-    courseRegisteringIds?: string[];
-};
+> & {};
 
-export class CreateUserFilterModel implements Partial<IPayloadCreateUser> {
+export class CourseRegisterFilterModel implements Partial<IPayloadUpdateUser> {
     @IsString()
     @IsNotEmpty()
     name?: string;
@@ -41,26 +39,44 @@ export class CreateUserFilterModel implements Partial<IPayloadCreateUser> {
     address?: string;
 
     @IsString()
-    @Min(8)
+    @MinLength(8)
     @IsNotEmpty()
     password?: string;
 
-    @IsArray()
-    @IsOptional()
-    courseIds?: string[] | undefined;
-
-    @IsArray()
-    @IsOptional()
-    courseRegisteringIds?: string[] | undefined;
-
-    constructor(payload: Partial<IPayloadCreateUser>) {
+    constructor(payload: Partial<IPayloadUpdateUser>) {
         this.name = payload.name;
         this.email = payload.email;
         this.phone = payload.phone;
         this.birthday = payload.birthday;
         this.address = payload.address;
         this.password = payload.password;
+    }
+}
+
+// region register course user
+export type IPayloadUserRegisterCourse = Omit<
+    ICourseRegisteringEntity,
+    'user' | 'id' | 'course' | 'createdAt' | 'updatedAt'
+> & {
+    courseIds: string[];
+    userId: string;
+};
+export class UserCourseRegisterFilterModel implements Partial<IPayloadUserRegisterCourse> {
+    @IsArray()
+    @IsNotEmpty()
+    courseIds?: string[];
+
+    constructor(payload: Partial<IPayloadUserRegisterCourse>) {
         this.courseIds = payload.courseIds;
-        this.courseRegisteringIds = payload.courseRegisteringIds;
+    }
+}
+
+export class UserAcceptCourseRegisterFilterModel implements Partial<IPayloadUserRegisterCourse> {
+    @IsUUID()
+    @IsNotEmpty()
+    userId?: string;
+
+    constructor(payload: Partial<IPayloadUserRegisterCourse>) {
+        this.userId = payload.userId;
     }
 }
