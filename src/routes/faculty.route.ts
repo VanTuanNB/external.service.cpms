@@ -6,6 +6,7 @@ const facultyController = new FacultyController();
 router
     .route('/:id')
     .get(facultyController.getById.bind(facultyController))
+    .put(facultyController.update.bind(facultyController))
     .delete(facultyController.permanentlyDelete.bind(facultyController));
 router
     .route('/')

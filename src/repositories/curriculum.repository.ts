@@ -2,6 +2,7 @@ import { EnumUserRole } from '@/core/constants/common.constant';
 import type { TypeOptionUpdateRecord } from '@/core/interfaces/common.interface';
 import type { ICurriculumEntity } from '@/database/entities/curriculum.entity';
 import curriculumSchema from '@/database/schemas/curriculum.schema';
+import type { UpdateQuery } from 'mongoose';
 import { BaseRepository } from './base-core.repository';
 
 export class CurriculumRepository extends BaseRepository {
@@ -36,10 +37,17 @@ export class CurriculumRepository extends BaseRepository {
     public async update(payload: ICurriculumEntity): Promise<ICurriculumEntity | null> {
         return await curriculumSchema.findByIdAndUpdate({ _id: payload.id }, payload, { new: true, upsert: true });
     }
+    public async updateManyRecord(
+        options: TypeOptionUpdateRecord<ICurriculumEntity>,
+    ): Promise<UpdateQuery<ICurriculumEntity>> {
+        return await curriculumSchema.updateMany(options.updateCondition, options.updateQuery, {
+            new: true,
+            upsert: true,
+        });
+    }
 
     public async updateRecord(options: TypeOptionUpdateRecord<ICurriculumEntity>): Promise<ICurriculumEntity | null> {
-        const { queryFieldName, queryFieldValue, updateQuery } = options;
-        return await curriculumSchema.findOneAndUpdate({ [queryFieldName]: queryFieldValue }, updateQuery, {
+        return await curriculumSchema.findOneAndUpdate(options.updateCondition, options.updateQuery, {
             new: true,
             upsert: true,
         });

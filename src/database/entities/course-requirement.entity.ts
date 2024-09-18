@@ -3,6 +3,8 @@ import { IsNotEmpty, IsOptional, IsString, IsUUID } from 'class-validator';
 export interface ICourseRequirementEntity {
     id: string;
     title: string;
+    code: string;
+    course: string;
     description?: string;
     createdAt?: string;
     updatedAt?: string;
@@ -16,6 +18,14 @@ export class CourseRequirementModel implements ICourseRequirementEntity {
     @IsString()
     @IsNotEmpty()
     title: string;
+
+    @IsString()
+    @IsNotEmpty()
+    code: string;
+
+    @IsUUID()
+    @IsNotEmpty()
+    course: string;
 
     @IsString()
     @IsOptional()
@@ -32,6 +42,8 @@ export class CourseRequirementModel implements ICourseRequirementEntity {
     constructor(params: ICourseRequirementEntity) {
         this.id = params.id;
         this.title = params.title;
+        this.course = params.course;
+        this.code = params.code;
         this.description = params.description;
         this.createdAt = params.createdAt;
         this.updatedAt = params.updatedAt;

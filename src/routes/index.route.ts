@@ -1,6 +1,8 @@
 import ExceptionController from '@/controllers/exception.controller';
 import { Router } from 'express';
 import authRouter from './auth.route';
+import courseRequirement from './course-requirement.route';
+import courseRouter from './course.route';
 import curriculumRouter from './curriculum.route';
 import facultyRouter from './faculty.route';
 import roleRouter from './role.route';
@@ -16,7 +18,8 @@ rootRouter.use('/role', roleRouter);
 rootRouter.use('/school', schoolRouter);
 rootRouter.use('/curriculum', curriculumRouter);
 rootRouter.use('/faculty', facultyRouter);
-// rootRouter.use('/user', userRouter);
+rootRouter.use('/course', courseRouter);
+rootRouter.use('/course-requirement', courseRequirement);
 // rootRouter.use('/server', serverRouter);
 // rootRouter.use('/friend', friendRouter);
 // rootRouter.use('/invite', inviteRouter);

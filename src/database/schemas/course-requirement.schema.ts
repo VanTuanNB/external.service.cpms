@@ -6,6 +6,8 @@ const courseRequirementSchema = new Schema<ICourseRequirementEntity & { _id: str
     {
         _id: { type: String, required: true },
         title: { type: String, required: true },
+        code: { type: String, required: true },
+        course: { type: String, required: true, ref: 'course' },
         description: { type: String, default: '' },
         createdAt: { type: String, default: moment().format() },
         updatedAt: { type: String, default: moment().format() },

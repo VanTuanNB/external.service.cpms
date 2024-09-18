@@ -2,7 +2,7 @@ import type { IPayloadCreateCurriculum, IPayloadUpdateCurriculum } from '@/contr
 import { ValidatorInput } from '@/core/helpers/class-validator.helper';
 import { ResponseHandler } from '@/core/helpers/response-handler.helper';
 import type { IResponseServer } from '@/core/interfaces/common.interface';
-import { CurriculumModel } from '@/database/entities/curriculum.entity';
+import { CurriculumModel, type ICurriculumEntity } from '@/database/entities/curriculum.entity';
 import { CurriculumRepository } from '@/repositories/curriculum.repository';
 import { FacultyRepository } from '@/repositories/faculty.repository';
 import moment from 'moment-timezone';
@@ -58,6 +58,14 @@ export class CurriculumService {
             });
             const validation = await this.validateInputService.validate(newCurriculum);
             if (validation) return validation;
+            if (newCurriculum.faculties.length) {
+                await this.curriculumRepository.updateManyRecord({
+                    updateCondition: { _id: { $nin: newCurriculum.id } },
+                    updateQuery: {
+                        $pull: { faculties: { $in: newCurriculum.faculties } },
+                    },
+                });
+            }
             const newCurriculumRecord = await this.curriculumRepository.create(newCurriculum);
             if (!newCurriculumRecord) return new ResponseHandler(500, false, 'Can not create new curriculum', null);
             return new ResponseHandler(201, true, 'Create new curriculum successfully', newCurriculumRecord);
@@ -94,9 +102,15 @@ export class CurriculumService {
             });
             const validation = await this.validateInputService.validate(newCurriculum);
             if (validation) return validation;
-            await this.curriculumRepository.updateRecord({
-                queryFieldName: '_id',
-                queryFieldValue: payload.id,
+            await this.curriculumRepository.updateManyRecord({
+                updateCondition: { _id: { $nin: newCurriculum.id } },
+                updateQuery: {
+                    $pull: { faculties: { $in: newCurriculum.faculties } },
+                },
+            });
+            let curriculumRecordUpdated: ICurriculumEntity | null = null;
+            curriculumRecordUpdated = await this.curriculumRepository.updateRecord({
+                updateCondition: { _id: newCurriculum.id },
                 updateQuery: {
                     $set: {
                         title: newCurriculum.title,
@@ -110,13 +124,14 @@ export class CurriculumService {
                     $addToSet: { faculties: { $each: newCurriculum.faculties } },
                 },
             });
-            const curriculumRecordUpdated = await this.curriculumRepository.updateRecord({
-                queryFieldName: '_id',
-                queryFieldValue: payload.id,
-                updateQuery: {
-                    $pull: { faculties: { $in: facultyIdsFiltered } },
-                },
-            });
+            if (facultyIdsFiltered.length) {
+                curriculumRecordUpdated = await this.curriculumRepository.updateRecord({
+                    updateCondition: { _id: newCurriculum.id },
+                    updateQuery: {
+                        $pull: { faculties: { $in: facultyIdsFiltered } },
+                    },
+                });
+            }
             if (!curriculumRecordUpdated) return new ResponseHandler(500, false, 'Can not update curriculum', null);
             return new ResponseHandler(200, true, 'Update curriculum successfully', curriculumRecordUpdated);
         } catch (error) {

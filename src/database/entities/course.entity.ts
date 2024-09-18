@@ -3,11 +3,14 @@ import { IsArray, IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID } from 'cla
 export interface ICourseEntity {
     id: string;
     title: string;
-    duration: string;
+    code: string;
+    durationStart: string;
+    durationEnd: string;
     quantity: number;
+    faculty: string;
+    // faq?: string[];
     requirements: string[];
     description?: string;
-    faq?: string[];
     createdAt?: string;
     updatedAt?: string;
 }
@@ -23,7 +26,19 @@ export class CourseModel implements ICourseEntity {
 
     @IsString()
     @IsNotEmpty()
-    duration: string;
+    code: string;
+
+    @IsString()
+    @IsNotEmpty()
+    durationStart: string;
+
+    @IsString()
+    @IsNotEmpty()
+    durationEnd: string;
+
+    @IsUUID()
+    @IsNotEmpty()
+    faculty: string;
 
     @IsArray()
     @IsNotEmpty()
@@ -33,29 +48,32 @@ export class CourseModel implements ICourseEntity {
     @IsNotEmpty()
     quantity: number;
 
-    @IsArray()
-    @IsOptional()
-    faq?: string[];
+    // @IsArray()
+    // @IsOptional()
+    // faq?: string[];
 
     @IsString()
     @IsOptional()
     description?: string;
 
     @IsString()
-    @IsNotEmpty()
+    @IsOptional()
     createdAt?: string;
 
     @IsString()
-    @IsNotEmpty()
+    @IsOptional()
     updatedAt?: string;
 
     constructor(params: ICourseEntity) {
         this.id = params.id;
         this.title = params.title;
-        this.duration = params.duration;
+        this.code = params.code;
+        this.durationStart = params.durationStart;
+        this.durationEnd = params.durationEnd;
         this.quantity = params.quantity;
+        this.faculty = params.faculty;
         this.requirements = params.requirements;
-        this.faq = params.faq;
+        // this.faq = params.faq;
         this.description = params.description;
         this.createdAt = params.createdAt;
         this.updatedAt = params.updatedAt;

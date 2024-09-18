@@ -1,4 +1,4 @@
-import type { UpdateQuery } from 'mongoose';
+import type { RootFilterQuery, UpdateQuery } from 'mongoose';
 
 export interface IResponseServer<T = any> {
     isSuccess: boolean;
@@ -14,7 +14,6 @@ export type IMessageError = {
 };
 
 export type TypeOptionUpdateRecord<T = any> = {
-    queryFieldName: string;
-    queryFieldValue: string;
+    updateCondition: RootFilterQuery<T & { _id: string }>;
     updateQuery: UpdateQuery<T & { _id: string }>;
 };
