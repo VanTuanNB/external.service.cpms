@@ -32,11 +32,11 @@ export class CourseRequirementModel implements ICourseRequirementEntity {
     description?: string;
 
     @IsString()
-    @IsNotEmpty()
+    @IsOptional()
     createdAt?: string;
 
     @IsString()
-    @IsNotEmpty()
+    @IsOptional()
     updatedAt?: string;
 
     constructor(params: ICourseRequirementEntity) {
