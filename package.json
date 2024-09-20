@@ -4,12 +4,12 @@
     "type": "module",
     "scripts": {
         "dev": "bun --env-file=.env.development --hot ./src/index.ts",
-        "start": "bun --env-file=.env ./dist/index.js",
+        "start": "bun --env-file=.env ./api/index.js",
         "docker-build": "sudo docker build --pull -t external.services.cpms-docker-server .",
         "docker-run": "sudo docker run -d -p 3000:3000 external.services.cpms-docker-server",
-        "build": "bun build ./src/index.ts --outdir ./dist --target=node",
+        "build": "bun build ./src/index.ts --outdir ./api --target=node",
         "test": "bun test --preload ./src/index.ts",
-        "production": "bun --env-file=.env --watch ./dist/index.js"
+        "production": "bun --env-file=.env --watch ./api/index.js"
     },
     "devDependencies": {
         "@types/bun": "latest",
@@ -41,7 +41,7 @@
     },
     "paths": {
         "@/*": [
-            "dist/*"
+            "api/*"
         ]
     }
 }

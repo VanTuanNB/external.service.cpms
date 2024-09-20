@@ -14,7 +14,10 @@ export class BaseRepository {
     protected formatterArrayIds<T extends Object>(array: Array<T>, options?: TypeOptionsFormatterParams) {
         if (!options) options = {};
         return structuredClone(array).map((item) =>
-            this.formatterObjectId(item, { fieldName: options.fieldName, newFieldName: options.newFieldName }),
+            this.formatterObjectId(item, {
+                fieldName: options?.fieldName,
+                newFieldName: options?.newFieldName,
+            }),
         );
     }
 }

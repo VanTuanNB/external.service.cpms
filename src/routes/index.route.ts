@@ -22,6 +22,14 @@ rootRouter.use('/course-requirement', courseRequirement);
 rootRouter.use('/user', userRouter);
 rootRouter.use('/news', newsRouter);
 
-rootRouter.use('*', new ExceptionController().endpointException);
+rootRouter.use(
+    '*',
+    (req, res, next) => {
+        console.log('req', req);
+        console.log(`Request received: ${req.method} - ${req.url}`);
+        next();
+    },
+    new ExceptionController().endpointException,
+);
 
 export default rootRouter;
