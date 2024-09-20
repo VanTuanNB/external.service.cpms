@@ -13,7 +13,7 @@ const userSchema = new Schema<IUserEntity & { _id: string }>(
         address: { type: String, required: true },
         name: { type: String, required: true },
         roles: [{ type: String, required: true, default: EnumUserRole.USER, ref: 'roles' }],
-        courses: [{ type: String, default: [], ref: 'courses' }],
+        courses: [{ type: String, default: [], ref: 'user-courses' }],
         coursesRegistering: [{ type: String, default: [], ref: 'courses-registering' }],
         refreshToken: { type: String, required: true },
         createdAt: { type: String, default: moment().format() },
@@ -30,4 +30,4 @@ userSchema.methods.toJSON = function () {
     delete user._id;
     return user;
 };
-export default mongoose.model<IUserEntity & { _id: string }>('user', userSchema);
+export default mongoose.model<IUserEntity & { _id: string }>('users', userSchema);

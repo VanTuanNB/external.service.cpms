@@ -11,6 +11,45 @@ export class GetInfoCourseRequirementFilterModel implements Partial<ICourseRequi
     }
 }
 
+// region get list paging
+export interface IPayloadGetListCourseRequirement {
+    page: number;
+    limit: number;
+    keyword?: string;
+    durationStart?: string;
+    durationEnd?: string;
+}
+
+export class GetPagingCourseRequirementFilterModel implements Partial<IPayloadGetListCourseRequirement> {
+    @IsString()
+    @IsOptional()
+    page?: number;
+
+    @IsString()
+    @IsOptional()
+    limit?: number;
+
+    @IsString()
+    @IsOptional()
+    keyword?: string;
+
+    @IsString()
+    @IsOptional()
+    durationStart?: string;
+
+    @IsString()
+    @IsOptional()
+    durationEnd?: string;
+
+    constructor(payload: Partial<IPayloadGetListCourseRequirement>) {
+        this.page = payload.page;
+        this.limit = payload.limit;
+        this.keyword = payload.keyword;
+        this.durationStart = payload.durationStart;
+        this.durationEnd = payload.durationEnd;
+    }
+}
+
 // region create payload
 export type IPayloadCreateCourseRequirement = Omit<
     ICourseRequirementEntity,

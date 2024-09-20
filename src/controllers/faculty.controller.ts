@@ -1,14 +1,27 @@
 import { EModePayload, Required } from '@/core/decorators/validate.decorator';
 import { FacultyService } from '@/services/faculty.service';
 import type { Request, Response } from 'express';
-import { CreateFacultyFilterModel, GetInfoFacultyFilterModel, UpdateFacultyFilterModel } from './filters/faculty.filter';
+import {
+    CreateFacultyFilterModel,
+    GetInfoFacultyFilterModel,
+    GetPagingFacultyFilterModel,
+    UpdateFacultyFilterModel,
+    type IPayloadGetListFaculty,
+} from './filters/faculty.filter';
 
 export default class FacultyController {
     private facultyService = new FacultyService();
     constructor() {}
 
+    @Required(GetPagingFacultyFilterModel, EModePayload.QUERY)
     public async getList(req: Request, res: Response): Promise<Response> {
-        const result = await this.facultyService.getList();
+        const query = (req.query as Partial<IPayloadGetListFaculty>) || {};
+        const payload: IPayloadGetListFaculty = {
+            ...query,
+            page: Number(query.page) || 1,
+            limit: Number(query.limit) || 10,
+        };
+        const result = await this.facultyService.getList(payload);
         return res.status(result.status).json(result);
     }
 

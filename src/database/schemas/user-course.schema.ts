@@ -6,8 +6,8 @@ import type { IUserCourseEntity } from '../entities/user-course.entity';
 const userCourseSchema = new Schema<IUserCourseEntity & { _id: string }>(
     {
         _id: { type: String, required: true },
-        user: { type: String, required: true, ref: 'user' },
-        course: { type: String, required: true, ref: 'course' },
+        user: { type: String, required: true, ref: 'users' },
+        course: { type: String, required: true, ref: 'courses' },
         status: { type: Number, required: true, default: EnumUserCourseStatus.PROCESSING },
         createdAt: { type: String, default: moment().format() },
         updatedAt: { type: String, default: moment().format() },

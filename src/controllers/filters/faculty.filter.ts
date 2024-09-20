@@ -1,6 +1,6 @@
 import type { IFacultyEntity } from '@/database/entities/faculty.entity';
 import type { ISchoolEntity } from '@/database/entities/school.entity';
-import { IsArray, IsNotEmpty, IsString, IsUUID } from 'class-validator';
+import { IsArray, IsNotEmpty, IsOptional, IsString, IsUUID } from 'class-validator';
 
 export class GetInfoFacultyFilterModel implements Partial<ISchoolEntity> {
     @IsString()
@@ -9,6 +9,45 @@ export class GetInfoFacultyFilterModel implements Partial<ISchoolEntity> {
 
     constructor(payload: Partial<ISchoolEntity>) {
         this.id = payload.id;
+    }
+}
+
+// region get list paging
+export interface IPayloadGetListFaculty {
+    page: number;
+    limit: number;
+    keyword?: string;
+    durationStart?: string;
+    durationEnd?: string;
+}
+
+export class GetPagingFacultyFilterModel implements Partial<IPayloadGetListFaculty> {
+    @IsString()
+    @IsOptional()
+    page?: number;
+
+    @IsString()
+    @IsOptional()
+    limit?: number;
+
+    @IsString()
+    @IsOptional()
+    keyword?: string;
+
+    @IsString()
+    @IsOptional()
+    durationStart?: string;
+
+    @IsString()
+    @IsOptional()
+    durationEnd?: string;
+
+    constructor(payload: Partial<IPayloadGetListFaculty>) {
+        this.page = payload.page;
+        this.limit = payload.limit;
+        this.keyword = payload.keyword;
+        this.durationStart = payload.durationStart;
+        this.durationEnd = payload.durationEnd;
     }
 }
 
@@ -57,7 +96,6 @@ export class CreateFacultyFilterModel implements Partial<IPayloadCreateFaculty> 
         this.courseIds = payload.courseIds;
     }
 }
-
 
 // region update
 

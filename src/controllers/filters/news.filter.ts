@@ -11,6 +11,45 @@ export class GetInfoNewsFilterModel implements Partial<INewsEntity> {
     }
 }
 
+// region get list paging
+export interface IPayloadGetListNews {
+    page: number;
+    limit: number;
+    keyword?: string;
+    durationStart?: string;
+    durationEnd?: string;
+}
+
+export class GetPagingNewsFilterModel implements Partial<IPayloadGetListNews> {
+    @IsString()
+    @IsOptional()
+    page?: number;
+
+    @IsString()
+    @IsOptional()
+    limit?: number;
+
+    @IsString()
+    @IsOptional()
+    keyword?: string;
+
+    @IsString()
+    @IsOptional()
+    durationStart?: string;
+
+    @IsString()
+    @IsOptional()
+    durationEnd?: string;
+
+    constructor(payload: Partial<IPayloadGetListNews>) {
+        this.page = payload.page;
+        this.limit = payload.limit;
+        this.keyword = payload.keyword;
+        this.durationStart = payload.durationStart;
+        this.durationEnd = payload.durationEnd;
+    }
+}
+
 export type IPayloadCreateNews = Omit<INewsEntity, 'createdAt' | 'updatedAt'> & {};
 
 export class CreateNewsFilterModel implements Partial<IPayloadCreateNews> {

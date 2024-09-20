@@ -1,7 +1,7 @@
-import type { IPayloadCreateNews } from '@/controllers/filters/news.filter';
+import type { IPayloadCreateNews, IPayloadGetListNews } from '@/controllers/filters/news.filter';
 import { ValidatorInput } from '@/core/helpers/class-validator.helper';
 import { ResponseHandler } from '@/core/helpers/response-handler.helper';
-import type { IResponseServer } from '@/core/interfaces/common.interface';
+import type { IResponseServer, QueryType } from '@/core/interfaces/common.interface';
 import { NewsModel } from '@/database/entities/news.entity';
 
 import { NewsRepository } from '@/repositories/news.repostiory';
@@ -13,10 +13,33 @@ export class NewsService {
     private validateInputService = new ValidatorInput();
     constructor() {}
 
-    public async getList(): Promise<IResponseServer> {
+    public async getList(payload: IPayloadGetListNews): Promise<IResponseServer> {
         try {
-            const newsRecords = await this.newsRepository.getList();
-            return new ResponseHandler(200, true, 'Get list news successfully', newsRecords);
+            const { page = 1, limit = 10, keyword } = payload;
+            const skip = (page - 1) * limit;
+            let query: QueryType = {};
+            if (keyword) {
+                query.$or = [
+                    { title: { $regex: keyword, $options: 'i' } },
+                    { contents: { $regex: keyword, $options: 'i' } },
+                    { description: { $regex: keyword, $options: 'i' } },
+                ];
+            }
+            const paging = {
+                skip,
+                limit,
+                page,
+            };
+            const { items, totalItems } = await this.newsRepository.getList(query, paging);
+            const totalPages = Math.ceil(totalItems / limit);
+
+            return new ResponseHandler(200, true, 'Get List curriculum successfully', {
+                items,
+                totalItems,
+                totalPages,
+                page,
+                limit,
+            });
         } catch (error) {
             console.log('error', error);
             return ResponseHandler.InternalServer();

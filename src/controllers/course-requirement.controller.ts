@@ -4,15 +4,24 @@ import type { Request, Response } from 'express';
 import {
     CreateCourseRequirementFilterModel,
     GetInfoCourseRequirementFilterModel,
+    GetPagingCourseRequirementFilterModel,
     UpdateCourseRequirementFilterModel,
+    type IPayloadGetListCourseRequirement,
 } from './filters/course-requirement.filter';
 
 export default class CourseRequirementController {
     private curriculumRequirementService = new CourseRequirementService();
     constructor() {}
 
+    @Required(GetPagingCourseRequirementFilterModel, EModePayload.QUERY)
     public async getList(req: Request, res: Response): Promise<Response> {
-        const result = await this.curriculumRequirementService.getList();
+        const query = (req.query as Partial<IPayloadGetListCourseRequirement>) || {};
+        const payload: IPayloadGetListCourseRequirement = {
+            ...query,
+            page: Number(query.page) || 1,
+            limit: Number(query.limit) || 10,
+        };
+        const result = await this.curriculumRequirementService.getList(payload);
         return res.status(result.status).json(result);
     }
 

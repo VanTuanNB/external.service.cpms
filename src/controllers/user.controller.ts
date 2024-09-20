@@ -5,16 +5,25 @@ import type { Request, Response } from 'express';
 import {
     CourseRegisterFilterModel,
     GetInfoUserFilterModel,
+    GetPagingUserFilterModel,
     UserAcceptCourseRegisterFilterModel,
     UserCourseRegisterFilterModel,
+    type IPayloadGetListUser,
 } from './filters/user.filter';
 
 export default class UserController {
     private userService = new UserService();
     constructor() {}
 
+    @Required(GetPagingUserFilterModel, EModePayload.QUERY)
     public async getList(req: Request, res: Response): Promise<Response> {
-        const result = await this.userService.getList();
+        const query = (req.query as Partial<IPayloadGetListUser>) || {};
+        const payload: IPayloadGetListUser = {
+            ...query,
+            page: Number(query.page) || 1,
+            limit: Number(query.limit) || 10,
+        };
+        const result = await this.userService.getList(payload);
         return res.status(result.status).json(result);
     }
 

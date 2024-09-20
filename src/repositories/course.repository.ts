@@ -1,5 +1,5 @@
 import { EnumUserRole } from '@/core/constants/common.constant';
-import type { TypeOptionUpdateRecord } from '@/core/interfaces/common.interface';
+import type { QueryPaging, QueryType, TypeOptionUpdateRecord } from '@/core/interfaces/common.interface';
 import type { ICourseEntity } from '@/database/entities/course.entity';
 import courseSchema from '@/database/schemas/course.schema';
 import type { UpdateQuery } from 'mongoose';
@@ -10,12 +10,59 @@ export class CourseRepository extends BaseRepository {
         super();
     }
 
-    public async getList(): Promise<ICourseEntity[]> {
-        return await courseSchema.find();
+    public async getList(
+        queryData: QueryType,
+        queryPaging: QueryPaging,
+    ): Promise<{ items: ICourseEntity[]; totalItems: number }> {
+        const { skip, limit } = queryPaging;
+        const items = await courseSchema
+            .find(queryData)
+            .skip(skip)
+            .limit(limit)
+            .populate({
+                path: 'faculty',
+                model: 'faculties',
+                select: 'title code description durationStart durationEnd createdAt updatedAt',
+                transform: (doc) => {
+                    const { _id, ...restOfProperties } = doc.toObject();
+                    return { id: _id, ...restOfProperties };
+                },
+            })
+            .populate({
+                path: 'requirements',
+                model: 'course-requirements',
+                select: 'title code description createdAt updatedAt',
+                transform: (doc) => {
+                    const { _id, ...restOfProperties } = doc.toObject();
+                    return { id: _id, ...restOfProperties };
+                },
+            });
+        const totalItems = await courseSchema.countDocuments(queryData);
+
+        return { items, totalItems };
     }
 
     public async getById(id: string): Promise<ICourseEntity | null> {
-        return await courseSchema.findById(id);
+        return await courseSchema
+            .findById(id)
+            .populate({
+                path: 'faculty',
+                model: 'faculties',
+                select: 'title code description durationStart durationEnd createdAt updatedAt',
+                transform: (doc) => {
+                    const { _id, ...restOfProperties } = doc.toObject();
+                    return { id: _id, ...restOfProperties };
+                },
+            })
+            .populate({
+                path: 'requirements',
+                model: 'course-requirements',
+                select: 'title code description createdAt updatedAt',
+                transform: (doc) => {
+                    const { _id, ...restOfProperties } = doc.toObject();
+                    return { id: _id, ...restOfProperties };
+                },
+            });
     }
 
     public async getByCode(code: string): Promise<ICourseEntity | null> {

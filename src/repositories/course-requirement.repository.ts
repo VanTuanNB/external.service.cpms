@@ -1,5 +1,5 @@
 import { EnumUserRole } from '@/core/constants/common.constant';
-import type { TypeOptionUpdateRecord } from '@/core/interfaces/common.interface';
+import type { QueryPaging, QueryType, TypeOptionUpdateRecord } from '@/core/interfaces/common.interface';
 import type { ICourseRequirementEntity } from '@/database/entities/course-requirement.entity';
 import courseRequirementSchema from '@/database/schemas/course-requirement.schema';
 import { BaseRepository } from './base-core.repository';
@@ -9,12 +9,39 @@ export class CourseRequirementRepository extends BaseRepository {
         super();
     }
 
-    public async getList(): Promise<ICourseRequirementEntity[]> {
-        return await courseRequirementSchema.find();
+    public async getList(
+        queryData: QueryType,
+        queryPaging: QueryPaging,
+    ): Promise<{ items: ICourseRequirementEntity[]; totalItems: number }> {
+        const { skip, limit } = queryPaging;
+        const items = await courseRequirementSchema
+            .find(queryData)
+            .skip(skip)
+            .limit(limit)
+            .populate({
+                path: 'course',
+                model: 'courses',
+                select: 'title code quantity description durationStart durationEnd createdAt updatedAt',
+                transform: (doc) => {
+                    const { _id, ...restOfProperties } = doc.toObject();
+                    return { id: _id, ...restOfProperties };
+                },
+            });
+        const totalItems = await courseRequirementSchema.countDocuments(queryData);
+
+        return { items, totalItems };
     }
 
     public async getById(id: string): Promise<ICourseRequirementEntity | null> {
-        return await courseRequirementSchema.findById(id);
+        return await courseRequirementSchema.findById(id).populate({
+            path: 'course',
+            model: 'courses',
+            select: 'title code quantity description durationStart durationEnd createdAt updatedAt',
+            transform: (doc) => {
+                const { _id, ...restOfProperties } = doc.toObject();
+                return { id: _id, ...restOfProperties };
+            },
+        });
     }
 
     public async getByCode(code: string): Promise<ICourseRequirementEntity | null> {

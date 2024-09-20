@@ -1,14 +1,27 @@
 import { EModePayload, Required } from '@/core/decorators/validate.decorator';
 import { CourseService } from '@/services/course.service';
 import type { Request, Response } from 'express';
-import { CreateCourseFilterModel, GetInfoCourseFilterModel, UpdateCourseFilterModel } from './filters/course.filter';
+import {
+    CreateCourseFilterModel,
+    GetInfoCourseFilterModel,
+    GetPagingCourseFilterModel,
+    UpdateCourseFilterModel,
+    type IPayloadGetListCourse,
+} from './filters/course.filter';
 
 export default class CourseController {
     private courseService = new CourseService();
     constructor() {}
 
+    @Required(GetPagingCourseFilterModel, EModePayload.QUERY)
     public async getList(req: Request, res: Response): Promise<Response> {
-        const result = await this.courseService.getList();
+        const query = (req.query as Partial<IPayloadGetListCourse>) || {};
+        const payload: IPayloadGetListCourse = {
+            ...query,
+            page: Number(query.page) || 1,
+            limit: Number(query.limit) || 10,
+        };
+        const result = await this.courseService.getList(payload);
         return res.status(result.status).json(result);
     }
 

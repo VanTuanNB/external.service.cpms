@@ -1,7 +1,8 @@
+import type { IPayloadGetListCurriculum } from '@/controllers/filters/curriculum.filter';
 import type { IPayloadCreateFaculty } from '@/controllers/filters/faculty.filter';
 import { ValidatorInput } from '@/core/helpers/class-validator.helper';
 import { ResponseHandler } from '@/core/helpers/response-handler.helper';
-import type { IResponseServer } from '@/core/interfaces/common.interface';
+import type { IResponseServer, QueryType } from '@/core/interfaces/common.interface';
 import { FacultyModel, type IFacultyEntity } from '@/database/entities/faculty.entity';
 import { CourseRepository } from '@/repositories/course.repository';
 import { CurriculumRepository } from '@/repositories/curriculum.repository';
@@ -17,10 +18,39 @@ export class FacultyService {
     private courseRepository = new CourseRepository();
     constructor() {}
 
-    public async getList(): Promise<IResponseServer> {
+    public async getList(payload: IPayloadGetListCurriculum): Promise<IResponseServer> {
         try {
-            const facultyRecords = await this.facultyRepository.getList();
-            return new ResponseHandler(200, true, 'Get list faculty successfully', facultyRecords);
+            const { page = 1, limit = 10, keyword, durationStart, durationEnd } = payload;
+            const skip = (page - 1) * limit;
+            let query: QueryType = {};
+            if (keyword) {
+                query.$or = [
+                    { title: { $regex: keyword, $options: 'i' } },
+                    { code: { $regex: keyword, $options: 'i' } },
+                    { description: { $regex: keyword, $options: 'i' } },
+                ];
+            }
+
+            if (durationStart && durationEnd) {
+                query.durationStart = { $gte: durationStart };
+                query.durationEnd = { $lte: durationEnd };
+            }
+            console.log('query', query);
+            const paging = {
+                skip,
+                limit,
+                page,
+            };
+            const { items, totalItems } = await this.facultyRepository.getList(query, paging);
+            const totalPages = Math.ceil(totalItems / limit);
+
+            return new ResponseHandler(200, true, 'Get List curriculum successfully', {
+                items,
+                totalItems,
+                totalPages,
+                page,
+                limit,
+            });
         } catch (error) {
             console.log('error', error);
             return ResponseHandler.InternalServer();

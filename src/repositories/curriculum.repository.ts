@@ -1,5 +1,5 @@
 import { EnumUserRole } from '@/core/constants/common.constant';
-import type { TypeOptionUpdateRecord } from '@/core/interfaces/common.interface';
+import type { QueryPaging, QueryType, TypeOptionUpdateRecord } from '@/core/interfaces/common.interface';
 import type { ICurriculumEntity } from '@/database/entities/curriculum.entity';
 import curriculumSchema from '@/database/schemas/curriculum.schema';
 import type { UpdateQuery } from 'mongoose';
@@ -10,12 +10,39 @@ export class CurriculumRepository extends BaseRepository {
         super();
     }
 
-    public async getList(): Promise<ICurriculumEntity[]> {
-        return await curriculumSchema.find();
+    public async getList(
+        queryData: QueryType,
+        queryPaging: QueryPaging,
+    ): Promise<{ items: ICurriculumEntity[]; totalItems: number }> {
+        const { skip, limit } = queryPaging;
+        const items = await curriculumSchema
+            .find(queryData)
+            .skip(skip)
+            .limit(limit)
+            .populate({
+                path: 'faculties',
+                model: 'faculties',
+                select: 'title code description durationStart durationEnd createdAt updatedAt',
+                transform: (doc) => {
+                    const { _id, ...restOfProperties } = doc.toObject();
+                    return { id: _id, ...restOfProperties };
+                },
+            });
+        const totalItems = await curriculumSchema.countDocuments(queryData);
+
+        return { items, totalItems };
     }
 
     public async getById(id: string): Promise<ICurriculumEntity | null> {
-        return await curriculumSchema.findById(id);
+        return await curriculumSchema.findById(id).populate({
+            path: 'faculties',
+            model: 'faculties',
+            select: 'title code description durationStart durationEnd createdAt updatedAt',
+            transform: (doc) => {
+                const { _id, ...restOfProperties } = doc.toObject();
+                return { id: _id, ...restOfProperties };
+            },
+        });
     }
 
     public async getByCode(code: string): Promise<ICurriculumEntity | null> {

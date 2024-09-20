@@ -10,6 +10,44 @@ export class GetInfoCourseFilterModel implements Partial<ICourseEntity> {
         this.id = payload.id;
     }
 }
+// region get list paging
+export interface IPayloadGetListCourse {
+    page: number;
+    limit: number;
+    keyword?: string;
+    durationStart?: string;
+    durationEnd?: string;
+}
+
+export class GetPagingCourseFilterModel implements Partial<IPayloadGetListCourse> {
+    @IsString()
+    @IsOptional()
+    page?: number;
+
+    @IsString()
+    @IsOptional()
+    limit?: number;
+
+    @IsString()
+    @IsOptional()
+    keyword?: string;
+
+    @IsString()
+    @IsOptional()
+    durationStart?: string;
+
+    @IsString()
+    @IsOptional()
+    durationEnd?: string;
+
+    constructor(payload: Partial<IPayloadGetListCourse>) {
+        this.page = payload.page;
+        this.limit = payload.limit;
+        this.keyword = payload.keyword;
+        this.durationStart = payload.durationStart;
+        this.durationEnd = payload.durationEnd;
+    }
+}
 
 // region create payload
 export type IPayloadCreateCourse = Omit<ICourseEntity, 'faculty' | 'requirements' | 'createdAt' | 'updatedAt'> & {

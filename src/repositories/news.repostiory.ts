@@ -1,5 +1,5 @@
 import { EnumUserRole } from '@/core/constants/common.constant';
-import type { TypeOptionUpdateRecord } from '@/core/interfaces/common.interface';
+import type { QueryPaging, QueryType, TypeOptionUpdateRecord } from '@/core/interfaces/common.interface';
 
 import type { INewsEntity } from '@/database/entities/news.entity';
 import newsSchema from '@/database/schemas/news.schema';
@@ -11,8 +11,15 @@ export class NewsRepository extends BaseRepository {
         super();
     }
 
-    public async getList(): Promise<INewsEntity[]> {
-        return await newsSchema.find();
+    public async getList(
+        queryData: QueryType,
+        queryPaging: QueryPaging,
+    ): Promise<{ items: INewsEntity[]; totalItems: number }> {
+        const { skip, limit } = queryPaging;
+        const items = await newsSchema.find(queryData).skip(skip).limit(limit);
+        const totalItems = await newsSchema.countDocuments(queryData);
+
+        return { items, totalItems };
     }
 
     public async getById(id: string): Promise<INewsEntity | null> {

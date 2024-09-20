@@ -1,6 +1,6 @@
 import type { ICourseRegisteringEntity } from '@/database/entities/course-register.entity';
 import type { IUserEntity } from '@/database/entities/user.entity';
-import { IsArray, IsEmail, IsNotEmpty, IsString, IsUUID, MinLength } from 'class-validator';
+import { IsArray, IsEmail, IsNotEmpty, IsOptional, IsString, IsUUID, MinLength } from 'class-validator';
 
 export class GetInfoUserFilterModel implements Partial<IUserEntity> {
     @IsUUID()
@@ -9,6 +9,44 @@ export class GetInfoUserFilterModel implements Partial<IUserEntity> {
 
     constructor(payload: Partial<IUserEntity>) {
         this.id = payload.id;
+    }
+}
+// region get list paging
+export interface IPayloadGetListUser {
+    page: number;
+    limit: number;
+    keyword?: string;
+    durationStart?: string;
+    durationEnd?: string;
+}
+
+export class GetPagingUserFilterModel implements Partial<IPayloadGetListUser> {
+    @IsString()
+    @IsOptional()
+    page?: number;
+
+    @IsString()
+    @IsOptional()
+    limit?: number;
+
+    @IsString()
+    @IsOptional()
+    keyword?: string;
+
+    @IsString()
+    @IsOptional()
+    durationStart?: string;
+
+    @IsString()
+    @IsOptional()
+    durationEnd?: string;
+
+    constructor(payload: Partial<IPayloadGetListUser>) {
+        this.page = payload.page;
+        this.limit = payload.limit;
+        this.keyword = payload.keyword;
+        this.durationStart = payload.durationStart;
+        this.durationEnd = payload.durationEnd;
     }
 }
 

@@ -1,10 +1,11 @@
 import type {
     IPayloadCreateCourseRequirement,
+    IPayloadGetListCourseRequirement,
     IPayloadUpdateCourseRequirement,
 } from '@/controllers/filters/course-requirement.filter';
 import { ValidatorInput } from '@/core/helpers/class-validator.helper';
 import { ResponseHandler } from '@/core/helpers/response-handler.helper';
-import type { IResponseServer } from '@/core/interfaces/common.interface';
+import type { IResponseServer, QueryType } from '@/core/interfaces/common.interface';
 import { CourseRequirementModel } from '@/database/entities/course-requirement.entity';
 import { CourseRequirementRepository } from '@/repositories/course-requirement.repository';
 import { CourseRepository } from '@/repositories/course.repository';
@@ -17,10 +18,33 @@ export class CourseRequirementService {
     private courseRepository = new CourseRepository();
     constructor() {}
 
-    public async getList(): Promise<IResponseServer> {
+    public async getList(payload: IPayloadGetListCourseRequirement): Promise<IResponseServer> {
         try {
-            const courseRequirementRecords = await this.courseRequirementRepository.getList();
-            return new ResponseHandler(200, true, 'Get list course requirement successfully', courseRequirementRecords);
+            const { page = 1, limit = 10, keyword } = payload;
+            const skip = (page - 1) * limit;
+            let query: QueryType = {};
+            if (keyword) {
+                query.$or = [
+                    { title: { $regex: keyword, $options: 'i' } },
+                    { code: { $regex: keyword, $options: 'i' } },
+                    { description: { $regex: keyword, $options: 'i' } },
+                ];
+            }
+            const paging = {
+                skip,
+                limit,
+                page,
+            };
+            const { items, totalItems } = await this.courseRequirementRepository.getList(query, paging);
+            const totalPages = Math.ceil(totalItems / limit);
+
+            return new ResponseHandler(200, true, 'Get List curriculum successfully', {
+                items,
+                totalItems,
+                totalPages,
+                page,
+                limit,
+            });
         } catch (error) {
             console.log('error', error);
             return ResponseHandler.InternalServer();

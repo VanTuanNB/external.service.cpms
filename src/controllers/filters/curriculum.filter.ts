@@ -1,6 +1,6 @@
 import type { ICurriculumEntity } from '@/database/entities/curriculum.entity';
 import type { ISchoolEntity } from '@/database/entities/school.entity';
-import { IsArray, IsNotEmpty, IsString } from 'class-validator';
+import { IsArray, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class GetInfoCurriculumFilterModel implements Partial<ISchoolEntity> {
     @IsString()
@@ -9,6 +9,45 @@ export class GetInfoCurriculumFilterModel implements Partial<ISchoolEntity> {
 
     constructor(payload: Partial<ISchoolEntity>) {
         this.id = payload.id;
+    }
+}
+
+// region get list paging
+export interface IPayloadGetListCurriculum {
+    page: number;
+    limit: number;
+    keyword?: string;
+    durationStart?: string;
+    durationEnd?: string;
+}
+
+export class GetPagingCurriculumFilterModel implements Partial<IPayloadGetListCurriculum> {
+    @IsString()
+    @IsOptional()
+    page?: number;
+
+    @IsString()
+    @IsOptional()
+    limit?: number;
+
+    @IsString()
+    @IsOptional()
+    keyword?: string;
+
+    @IsString()
+    @IsOptional()
+    durationStart?: string;
+
+    @IsString()
+    @IsOptional()
+    durationEnd?: string;
+
+    constructor(payload: Partial<IPayloadGetListCurriculum>) {
+        this.page = payload.page;
+        this.limit = payload.limit;
+        this.keyword = payload.keyword;
+        this.durationStart = payload.durationStart;
+        this.durationEnd = payload.durationEnd;
     }
 }
 

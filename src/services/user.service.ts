@@ -1,8 +1,12 @@
-import type { IPayloadUpdateUser, IPayloadUserRegisterCourse } from '@/controllers/filters/user.filter';
+import type {
+    IPayloadGetListUser,
+    IPayloadUpdateUser,
+    IPayloadUserRegisterCourse,
+} from '@/controllers/filters/user.filter';
 import { EnumUserCourseStatus } from '@/core/constants/common.constant';
 import { ValidatorInput } from '@/core/helpers/class-validator.helper';
 import { ResponseHandler } from '@/core/helpers/response-handler.helper';
-import type { IResponseServer } from '@/core/interfaces/common.interface';
+import type { IResponseServer, QueryType } from '@/core/interfaces/common.interface';
 import { CoursesRegistering } from '@/database/entities/course-register.entity';
 import { UserCourseModel } from '@/database/entities/user-course.entity';
 import { UserModel } from '@/database/entities/user.entity';
@@ -21,10 +25,33 @@ export class UserService {
     private validateInputService = new ValidatorInput();
     constructor() {}
 
-    public async getList(): Promise<IResponseServer> {
+    public async getList(payload: IPayloadGetListUser): Promise<IResponseServer> {
         try {
-            const curriculumRecords = await this.userRepository.getList();
-            return new ResponseHandler(200, true, 'Get list user successfully', curriculumRecords);
+            const { page = 1, limit = 10, keyword } = payload;
+            const skip = (page - 1) * limit;
+            let query: QueryType = {};
+            if (keyword) {
+                query.$or = [
+                    { title: { $regex: keyword, $options: 'i' } },
+                    { contents: { $regex: keyword, $options: 'i' } },
+                    { description: { $regex: keyword, $options: 'i' } },
+                ];
+            }
+            const paging = {
+                skip,
+                limit,
+                page,
+            };
+            const { items, totalItems } = await this.userRepository.getList(query, paging);
+            const totalPages = Math.ceil(totalItems / limit);
+
+            return new ResponseHandler(200, true, 'Get List curriculum successfully', {
+                items,
+                totalItems,
+                totalPages,
+                page,
+                limit,
+            });
         } catch (error) {
             console.log('error', error);
             return ResponseHandler.InternalServer();
@@ -106,11 +133,12 @@ export class UserService {
             const newUserCourseRecords = await this.userCourseRepository.insertMultiple(userCourseRecords);
             if (!newUserCourseRecords)
                 return new ResponseHandler(500, false, 'Can not create new course register', null);
+            const userCourseIds = newUserCourseRecords.map((record) => record.id);
             const userUpdated = await this.userRepository.updateRecord({
                 updateCondition: { _id: payload.userId },
                 updateQuery: {
-                    $addToSet: { courses: payload.courseIds },
-                    $pull: { coursesRegistering: { $in: payload.courseIds } },
+                    $addToSet: { courses: userCourseIds },
+                    $pull: { coursesRegistering: { $in: userCourseIds } },
                 },
             });
             if (!userUpdated) return new ResponseHandler(500, false, 'Can not accept course for this user', null);

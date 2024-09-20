@@ -5,8 +5,8 @@ import type { ICourseRegisteringEntity } from '../entities/course-register.entit
 const courseRegisteringSchema = new Schema<ICourseRegisteringEntity & { _id: string }>(
     {
         _id: { type: String, required: true },
-        user: { type: String, required: true, ref: 'user' },
-        course: { type: String, required: true, ref: 'course' },
+        user: { type: String, required: true, ref: 'users' },
+        course: { type: String, required: true, ref: 'courses' },
         createdAt: { type: String, default: moment().format() },
         updatedAt: { type: String, default: moment().format() },
     },

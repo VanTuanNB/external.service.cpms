@@ -1,14 +1,26 @@
 import { EModePayload, Required } from '@/core/decorators/validate.decorator';
 import { NewsService } from '@/services/news.service';
 import type { Request, Response } from 'express';
-import { CreateNewsFilterModel, GetInfoNewsFilterModel } from './filters/news.filter';
+import {
+    CreateNewsFilterModel,
+    GetInfoNewsFilterModel,
+    GetPagingNewsFilterModel,
+    type IPayloadGetListNews,
+} from './filters/news.filter';
 
 export default class NewsController {
     private newsService = new NewsService();
     constructor() {}
 
+    @Required(GetPagingNewsFilterModel, EModePayload.QUERY)
     public async getList(req: Request, res: Response): Promise<Response> {
-        const result = await this.newsService.getList();
+        const query = (req.query as Partial<IPayloadGetListNews>) || {};
+        const payload: IPayloadGetListNews = {
+            ...query,
+            page: Number(query.page) || 1,
+            limit: Number(query.limit) || 10,
+        };
+        const result = await this.newsService.getList(payload);
         return res.status(result.status).json(result);
     }
 
