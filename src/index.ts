@@ -31,7 +31,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(APP_PATH, rootRouter);
 app.get('/', (req, res) => {
-    return res.json(process.env);
+    return res.json(process.env || {});
 });
 
 Database.connect()
