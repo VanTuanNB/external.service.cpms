@@ -28,9 +28,10 @@ export class AdmissionsService {
             let query: QueryType = {};
             if (keyword) {
                 query.$or = [
-                    { title: { $regex: keyword, $options: 'i' } },
-                    { contents: { $regex: keyword, $options: 'i' } },
-                    { description: { $regex: keyword, $options: 'i' } },
+                    { email: { $regex: keyword, $options: 'i' } },
+                    { name: { $regex: keyword, $options: 'i' } },
+                    { phone: { $regex: keyword, $options: 'i' } },
+                    { address: { $regex: keyword, $options: 'i' } },
                 ];
             }
             const paging = {
@@ -100,7 +101,7 @@ export class AdmissionsService {
         try {
             const newsRecords = await this.admissionsRepository.getMetadataManyRecordQuery({
                 updateCondition: {
-                    id: { $in: admissionIds },
+                    _id: { $in: admissionIds },
                 },
                 updateQuery: {},
             });
@@ -139,7 +140,7 @@ export class AdmissionsService {
                     await this.admissionsRepository.permanentlyDelete(record.id);
                 }),
             );
-            return new ResponseHandler(200, true, 'Update the news successfully', null);
+            return new ResponseHandler(200, true, 'Upgrade to student successfully', null);
         } catch (error) {
             console.log('error', error);
             return ResponseHandler.InternalServer();
@@ -150,9 +151,9 @@ export class AdmissionsService {
         try {
             const facultyRecord = await this.admissionsRepository.permanentlyDelete(id);
             if (!facultyRecord) {
-                return new ResponseHandler(404, false, `News not found with id: ${id}`, null);
+                return new ResponseHandler(404, false, `Admissions not found with id: ${id}`, null);
             }
-            return new ResponseHandler(200, true, 'Deleted news successfully', facultyRecord);
+            return new ResponseHandler(200, true, 'Deleted admissions successfully', facultyRecord);
         } catch (error) {
             console.log('error', error);
             return ResponseHandler.InternalServer();

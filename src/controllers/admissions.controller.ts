@@ -42,4 +42,10 @@ export default class AdmissionsController {
         const result = await this.admissionsService.upgradeToStudent(req.body);
         return res.status(result.status).json(result);
     }
+
+    @Required(GetInfoAdmissionsFilterModel, EModePayload.PARAMS)
+    public async permanentlyDelete(req: Request, res: Response): Promise<Response> {
+        const result = await this.admissionsService.permanentlyDelete(req.body);
+        return res.status(result.status).json(result);
+    }
 }
