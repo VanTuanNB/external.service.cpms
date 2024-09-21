@@ -134,6 +134,10 @@ export class UserRepository extends BaseRepository {
         return { ...restOfProperties, id: _id.toString(), courses, coursesRegistering } as IUserEntity;
     }
 
+    public async getByIdNoPopulate(id: string): Promise<IUserEntity | null> {
+        return await userSchema.findById(id);
+    }
+
     public async getByCode(code: string): Promise<IUserEntity | null> {
         return await userSchema.findOne({ code });
     }

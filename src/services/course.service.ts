@@ -76,7 +76,7 @@ export class CourseService {
             if (courseRecord) {
                 return new ResponseHandler(200, true, 'Course is exits', courseRecord);
             }
-            const facultyRecord = await this.facultyRepository.getById(payload.facultyId);
+            const facultyRecord = await this.facultyRepository.getByIdNoPopulate(payload.facultyId);
             if (!facultyRecord) return new ResponseHandler(404, true, 'Faculty not found', facultyRecord);
             const id = uuidV4();
             const newCourse = new CourseModel({

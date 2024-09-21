@@ -110,7 +110,7 @@ export class CurriculumService {
 
     public async update(payload: IPayloadUpdateCurriculum): Promise<IResponseServer> {
         try {
-            const curriculumRecord = await this.curriculumRepository.getById(payload.id);
+            const curriculumRecord = await this.curriculumRepository.getByIdNoPopulate(payload.id);
             if (!curriculumRecord) {
                 return new ResponseHandler(404, true, 'Curriculum not found', curriculumRecord);
             }

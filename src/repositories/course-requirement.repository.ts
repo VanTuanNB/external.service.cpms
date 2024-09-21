@@ -46,6 +46,10 @@ export class CourseRequirementRepository extends BaseRepository {
         });
     }
 
+    public async getByIdNoPopulate(id: string): Promise<ICourseRequirementEntity | null> {
+        return await courseRequirementSchema.findById(id);
+    }
+
     public async getByCode(code: string): Promise<ICourseRequirementEntity | null> {
         return await courseRequirementSchema.findOne({ code });
     }

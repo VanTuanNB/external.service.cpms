@@ -182,7 +182,7 @@ export class UserService {
 
     public async update(payload: IPayloadUpdateUser): Promise<IResponseServer> {
         try {
-            const userRecord = await this.userRepository.getById(payload.id);
+            const userRecord = await this.userRepository.getByIdNoPopulate(payload.id);
             if (!userRecord) {
                 return new ResponseHandler(404, true, 'User not found', userRecord);
             }

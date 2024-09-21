@@ -47,6 +47,10 @@ export class CurriculumRepository extends BaseRepository {
         });
     }
 
+    public async getByIdNoPopulate(id: string): Promise<ICurriculumEntity | null> {
+        return await curriculumSchema.findById(id);
+    }
+
     public async getByCode(code: string): Promise<ICurriculumEntity | null> {
         return await curriculumSchema.findOne({ code });
     }

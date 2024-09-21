@@ -110,7 +110,7 @@ export class FacultyService {
 
     public async update(payload: IPayloadCreateFaculty): Promise<IResponseServer> {
         try {
-            const facultyRecord = await this.facultyRepository.getById(payload.id);
+            const facultyRecord = await this.facultyRepository.getByIdNoPopulate(payload.id);
             if (!facultyRecord) {
                 return new ResponseHandler(404, true, `Faculty with id ${payload.id} not found`, facultyRecord);
             }
@@ -133,7 +133,6 @@ export class FacultyService {
                 curriculum: payload.curriculumId,
                 updatedAt: moment().format(),
             });
-            console.log('facultyInstance', facultyInstance);
             const validation = await this.validateInputService.validate(facultyInstance);
             if (validation) return validation;
             await this.facultyRepository.updateManyRecord({

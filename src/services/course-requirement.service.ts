@@ -92,7 +92,7 @@ export class CourseRequirementService {
 
     public async update(payload: IPayloadUpdateCourseRequirement): Promise<IResponseServer> {
         try {
-            const courseRequirementRecord = await this.courseRequirementRepository.getById(payload.id);
+            const courseRequirementRecord = await this.courseRequirementRepository.getByIdNoPopulate(payload.id);
             if (!courseRequirementRecord) {
                 return new ResponseHandler(404, true, `Course requirement with id ${payload.id} not found`, null);
             }

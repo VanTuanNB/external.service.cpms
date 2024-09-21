@@ -47,6 +47,10 @@ export class FacultyRepository extends BaseRepository {
         });
     }
 
+    public async getByIdNoPopulate(id: string): Promise<IFacultyEntity | null> {
+        return await facultySchema.findById(id);
+    }
+
     public async getByCode(code: string): Promise<IFacultyEntity | null> {
         return await facultySchema.findOne({ code });
     }
