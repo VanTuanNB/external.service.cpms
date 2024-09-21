@@ -29,7 +29,6 @@ export class CourseService {
                 query.$or = [
                     { title: { $regex: keyword, $options: 'i' } },
                     { code: { $regex: keyword, $options: 'i' } },
-                    { quantity: { $regex: keyword, $options: 'i' } },
                     { description: { $regex: keyword, $options: 'i' } },
                 ];
             }
