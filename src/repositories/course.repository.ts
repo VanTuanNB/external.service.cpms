@@ -69,6 +69,10 @@ export class CourseRepository extends BaseRepository {
             });
     }
 
+    public async getByAll(): Promise<ICourseEntity[] | null> {
+        return await courseSchema.find();
+    }
+
     public async getByCode(code: string): Promise<ICourseEntity | null> {
         return await courseSchema.findOne({ code });
     }

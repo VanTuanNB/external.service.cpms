@@ -1,6 +1,7 @@
 import { EnumUserRole } from '@/core/constants/common.constant';
 import type { QueryPaging, QueryType, TypeOptionUpdateRecord } from '@/core/interfaces/common.interface';
 import type { IUserEntity } from '@/database/entities/user.entity';
+import courseSchema from '@/database/schemas/course.schema';
 import roleSchema from '@/database/schemas/role.schema';
 import userSchema from '@/database/schemas/user.schema';
 import type { UpdateQuery } from 'mongoose';
@@ -144,12 +145,27 @@ export class UserRepository extends BaseRepository {
             role: role.role,
             description: role.description,
         }));
+        let courseIds: string[] = [];
+        let coursesRemaining: any = [];
+        if (courses && courses.length) {
+            courseIds = courses.map((course: any) => course.id);
+        }
+        if (coursesRegistering && coursesRegistering.length) {
+            const courses = coursesRegistering.map((course: any) => course.id);
+            courseIds = [...courseIds, ...courses];
+        }
+        if (courseIds.length) {
+            const courses = await courseSchema.find();
+            coursesRemaining = courses.filter((course) => !courseIds.includes(course.id));
+        }
+        console.log('coursesRemaining', coursesRemaining);
         return {
             ...restOfProperties,
             id: _id.toString(),
             courses,
             coursesRegistering,
             roles: rolesMapping as any,
+            coursesRemaining,
         } as IUserEntity;
     }
 
