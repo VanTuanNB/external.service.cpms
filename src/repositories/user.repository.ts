@@ -82,6 +82,7 @@ export class UserRepository extends BaseRepository {
                 role: role.role,
                 description: role.description,
             })),
+            id: user.id ? user.id : user._id.toString(),
         }));
 
         const totalItems = await userSchema.countDocuments(queryData);
