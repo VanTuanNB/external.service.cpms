@@ -32,9 +32,10 @@ export class UserService {
             let query: QueryType = {};
             if (keyword) {
                 query.$or = [
-                    { title: { $regex: keyword, $options: 'i' } },
-                    { contents: { $regex: keyword, $options: 'i' } },
-                    { description: { $regex: keyword, $options: 'i' } },
+                    { name: { $regex: keyword, $options: 'i' } },
+                    { email: { $regex: keyword, $options: 'i' } },
+                    { birthday: { $regex: keyword, $options: 'i' } },
+                    { address: { $regex: keyword, $options: 'i' } },
                 ];
             }
             const paging = {

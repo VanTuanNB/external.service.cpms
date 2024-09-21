@@ -3,9 +3,9 @@ import type { RequestAuthorized } from '@/core/interfaces/common.interface';
 import { UserService } from '@/services/user.service';
 import type { Request, Response } from 'express';
 import {
-    CourseRegisterFilterModel,
     GetInfoUserFilterModel,
     GetPagingUserFilterModel,
+    UpdateUserFilterModel,
     UserAcceptCourseRegisterFilterModel,
     UserCourseRegisterFilterModel,
     type IPayloadGetListUser,
@@ -52,7 +52,7 @@ export default class UserController {
     }
 
     @Required(GetInfoUserFilterModel, EModePayload.PARAMS)
-    @Required(CourseRegisterFilterModel)
+    @Required(UpdateUserFilterModel)
     public async update(req: Request, res: Response): Promise<Response> {
         const payload = Object.assign(req.body, req.params);
         const result = await this.userService.update(payload);

@@ -209,6 +209,10 @@ export class UserRepository extends BaseRepository {
         });
     }
 
+    public async insertMultiple(payload: IUserEntity[]): Promise<IUserEntity[] | null> {
+        return await userSchema.insertMany(this.formatterArrayIds(payload));
+    }
+
     public async updateManyRecord(options: TypeOptionUpdateRecord<IUserEntity>): Promise<UpdateQuery<IUserEntity>> {
         return await userSchema.updateMany(options.updateCondition, options.updateQuery, {
             new: true,

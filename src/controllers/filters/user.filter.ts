@@ -91,6 +91,36 @@ export class CourseRegisterFilterModel implements Partial<IPayloadUpdateUser> {
     }
 }
 
+export class UpdateUserFilterModel implements Partial<IPayloadUpdateUser> {
+    @IsString()
+    @IsNotEmpty()
+    name?: string;
+
+    @IsEmail()
+    @IsNotEmpty()
+    email?: string;
+
+    @IsString()
+    @IsNotEmpty()
+    phone?: string;
+
+    @IsString()
+    @IsNotEmpty()
+    birthday?: string;
+
+    @IsString()
+    @IsNotEmpty()
+    address?: string;
+
+    constructor(payload: Partial<IPayloadUpdateUser>) {
+        this.name = payload.name;
+        this.email = payload.email;
+        this.phone = payload.phone;
+        this.birthday = payload.birthday;
+        this.address = payload.address;
+    }
+}
+
 // region register course user
 export type IPayloadUserRegisterCourse = Omit<
     ICourseRegisteringEntity,

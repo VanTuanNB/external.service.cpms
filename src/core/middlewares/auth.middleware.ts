@@ -23,8 +23,15 @@ export class Authentication {
             next();
         } catch (error: any) {
             console.log(error);
-            const responseError = ResponseHandler.InternalServer();
-            return res.status(responseError.status).json(responseError);
+            const condition =
+                typeof error === 'object' && error.hasOwnProperty('name') && error.hasOwnProperty('message');
+            const errorResponse = new ResponseHandler(
+                condition ? 403 : 500,
+                false,
+                condition ? 'INVALID_TOKEN' : 'INTERNAL_SERVER_ERROR',
+                null,
+            );
+            return res.status(errorResponse.status).json(errorResponse);
         }
     }
 
@@ -45,8 +52,15 @@ export class Authentication {
             next();
         } catch (error: any) {
             console.log(error);
-            const responseError = ResponseHandler.InternalServer();
-            return res.status(responseError.status).json(responseError);
+            const condition =
+                typeof error === 'object' && error.hasOwnProperty('name') && error.hasOwnProperty('message');
+            const errorResponse = new ResponseHandler(
+                condition ? 403 : 500,
+                false,
+                condition ? 'INVALID_TOKEN' : 'INTERNAL_SERVER_ERROR',
+                null,
+            );
+            return res.status(errorResponse.status).json(errorResponse);
         }
     }
 }
