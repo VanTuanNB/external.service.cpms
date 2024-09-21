@@ -1,6 +1,7 @@
 import { EnumUserRole } from '@/core/constants/common.constant';
 import type { QueryPaging, QueryType, TypeOptionUpdateRecord } from '@/core/interfaces/common.interface';
 import type { IUserEntity } from '@/database/entities/user.entity';
+import roleSchema from '@/database/schemas/role.schema';
 import userSchema from '@/database/schemas/user.schema';
 import type { UpdateQuery } from 'mongoose';
 import { BaseRepository } from './base-core.repository';
@@ -21,7 +22,7 @@ export class UserRepository extends BaseRepository {
         const { skip, limit } = queryPaging;
         const items = await userSchema
             .find(queryData)
-            .select('-refreshToken -password -roles -__v')
+            .select('-refreshToken -password -__v')
             .skip(skip)
             .limit(limit)
             .populate({
@@ -45,6 +46,7 @@ export class UserRepository extends BaseRepository {
                 },
             });
 
+        const roles = await roleSchema.find();
         // Transform the populated data
         const transformedItems = items.map((user) => ({
             ...user.toObject(),
@@ -73,6 +75,12 @@ export class UserRepository extends BaseRepository {
                     createdAt: course.course?.createdAt,
                     updatedAt: course.course?.updatedAt,
                 })) || [],
+            roles: roles.map((role) => ({
+                id: role.id ? role.id : role._id.toString(),
+                title: role.title,
+                role: role.role,
+                description: role.description,
+            })),
         }));
 
         const totalItems = await userSchema.countDocuments(queryData);
@@ -83,7 +91,7 @@ export class UserRepository extends BaseRepository {
     public async getById(id: string): Promise<IUserEntity | null> {
         const user = await userSchema
             .findById(id)
-            .select('-refreshToken -password -roles -__v')
+            .select('-refreshToken -password -__v')
             .populate({
                 path: 'courses',
                 model: 'user-courses',
@@ -106,7 +114,7 @@ export class UserRepository extends BaseRepository {
             });
 
         if (!user) return null;
-
+        const roles = await roleSchema.find();
         const userObject = user.toObject();
         const { _id, ...restOfProperties } = userObject;
         const courses: any =
@@ -130,8 +138,19 @@ export class UserRepository extends BaseRepository {
                 durationEnd: course.course?.durationEnd,
                 quantity: course.course?.quantity,
             })) || [];
-
-        return { ...restOfProperties, id: _id.toString(), courses, coursesRegistering } as IUserEntity;
+        const rolesMapping = roles.map((role) => ({
+            id: role.id ? role.id : role._id.toString(),
+            title: role.title,
+            role: role.role,
+            description: role.description,
+        }));
+        return {
+            ...restOfProperties,
+            id: _id.toString(),
+            courses,
+            coursesRegistering,
+            roles: rolesMapping as any,
+        } as IUserEntity;
     }
 
     public async getByIdNoPopulate(id: string): Promise<IUserEntity | null> {
