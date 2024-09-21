@@ -9,6 +9,7 @@ export interface IFacultyEntity {
     durationStart: string;
     durationEnd: string;
     courses: string[];
+    thumbnailUrl?: string;
     createdAt?: string;
     updatedAt?: string;
 }
@@ -48,6 +49,10 @@ export class FacultyModel implements IFacultyEntity {
 
     @IsString()
     @IsOptional()
+    thumbnailUrl?: string;
+
+    @IsString()
+    @IsOptional()
     createdAt?: string;
 
     @IsString()
@@ -63,6 +68,7 @@ export class FacultyModel implements IFacultyEntity {
         this.durationStart = params.durationStart;
         this.durationEnd = params.durationEnd;
         this.courses = params.courses;
+        this.thumbnailUrl = params.thumbnailUrl;
         this.createdAt = params.createdAt;
         this.updatedAt = params.updatedAt;
     }

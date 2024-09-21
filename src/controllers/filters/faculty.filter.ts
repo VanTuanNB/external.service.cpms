@@ -86,6 +86,10 @@ export class CreateFacultyFilterModel implements Partial<IPayloadCreateFaculty> 
     @IsNotEmpty()
     curriculumId?: string;
 
+    @IsString()
+    @IsOptional()
+    thumbnailUrl?: string;
+
     constructor(payload: Partial<IPayloadCreateFaculty>) {
         this.title = payload.title;
         this.description = payload.description;
@@ -94,6 +98,7 @@ export class CreateFacultyFilterModel implements Partial<IPayloadCreateFaculty> 
         this.durationEnd = payload.durationEnd;
         this.curriculumId = payload.curriculumId;
         this.courseIds = payload.courseIds;
+        this.thumbnailUrl = payload.thumbnailUrl;
     }
 }
 
@@ -132,6 +137,10 @@ export class UpdateFacultyFilterModel implements Partial<IPayloadUpdateFaculty> 
     @IsNotEmpty()
     curriculumId?: string;
 
+    @IsString()
+    @IsOptional()
+    thumbnailUrl?: string;
+
     constructor(payload: Partial<IPayloadUpdateFaculty>) {
         this.title = payload.title;
         this.description = payload.description;
@@ -140,5 +149,6 @@ export class UpdateFacultyFilterModel implements Partial<IPayloadUpdateFaculty> 
         this.durationEnd = payload.durationEnd;
         this.courseIds = payload.courseIds;
         this.curriculumId = payload.curriculumId;
+        this.thumbnailUrl = payload.thumbnailUrl;
     }
 }

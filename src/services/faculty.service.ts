@@ -88,6 +88,7 @@ export class FacultyService {
                 durationEnd: payload.durationEnd,
                 title: payload.title.trim(),
                 description: payload.description?.trim(),
+                thumbnailUrl: payload.thumbnailUrl,
             });
             const validation = await this.validateInputService.validate(newFaculty);
             if (validation) return validation;
@@ -131,6 +132,7 @@ export class FacultyService {
                 durationStart: payload.durationStart || facultyRecord.durationStart,
                 durationEnd: payload.durationEnd || facultyRecord.durationEnd,
                 curriculum: payload.curriculumId,
+                thumbnailUrl: payload.thumbnailUrl,
                 updatedAt: moment().format(),
             });
             const validation = await this.validateInputService.validate(facultyInstance);
@@ -151,6 +153,7 @@ export class FacultyService {
                         code: facultyInstance.code,
                         durationStart: facultyInstance.durationStart,
                         durationEnd: facultyInstance.durationEnd,
+                        thumbnailUrl: payload.thumbnailUrl,
                         curriculum: facultyInstance.curriculum,
                         updatedAt: facultyInstance.updatedAt,
                         createdAt: facultyInstance.createdAt,

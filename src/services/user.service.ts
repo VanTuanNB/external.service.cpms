@@ -158,14 +158,15 @@ export class UserService {
 
     public async completeCourse(payload: IPayloadUserRegisterCourse): Promise<IResponseServer> {
         try {
-            const courseRegisterRecord = await this.courseRegisterRepository.getMetadataManyRecordQuery({
+            const courseRegisterRecord = await this.userCourseRepository.getMetadataManyRecordQuery({
                 updateCondition: { user: payload.userId, course: { $in: payload.courseIds } },
                 updateQuery: {},
             });
             if (!courseRegisterRecord.length)
                 return new ResponseHandler(400, true, 'Course registration not is exits', courseRegisterRecord);
+            const courseIds = courseRegisterRecord.map((record) => record.id || (record as any)._id);
             const courseRegisterRecordUpdated = await this.courseRegisterRepository.updateRecord({
-                updateCondition: { user: payload.userId, course: { $in: payload.courseIds } },
+                updateCondition: { user: payload.userId, course: { $in: courseIds } },
                 updateQuery: {
                     $set: {
                         status: EnumUserCourseStatus.COMPLETED,

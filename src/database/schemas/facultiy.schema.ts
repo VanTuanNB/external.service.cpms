@@ -12,6 +12,7 @@ const facultySchema = new Schema<IFacultyEntity & { _id: string }>(
         durationStart: { type: String, required: true },
         durationEnd: { type: String, required: true },
         code: { type: String, required: true },
+        thumbnailUrl: { type: String, default: '' },
         courses: [{ type: String, default: [], ref: 'courses' }],
         description: { type: String, default: '' },
         createdAt: { type: String, default: moment().format() },
