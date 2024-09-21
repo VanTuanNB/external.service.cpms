@@ -164,9 +164,9 @@ export class UserService {
             });
             if (!courseRegisterRecord.length)
                 return new ResponseHandler(400, true, 'Course registration not is exits', courseRegisterRecord);
-            const courseIds = courseRegisterRecord.map((record) => record.id || (record as any)._id);
-            const courseRegisterRecordUpdated = await this.courseRegisterRepository.updateRecord({
-                updateCondition: { user: payload.userId, course: { $in: courseIds } },
+            const recordIds = courseRegisterRecord.map((record) => record.id || (record as any)._id);
+            const courseRegisterRecordUpdated = await this.userCourseRepository.updateRecord({
+                updateCondition: { _id: { $in: recordIds } },
                 updateQuery: {
                     $set: {
                         status: EnumUserCourseStatus.COMPLETED,
