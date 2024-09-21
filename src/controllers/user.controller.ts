@@ -35,7 +35,7 @@ export default class UserController {
 
     @Required(UserCourseRegisterFilterModel)
     public async registerCourse(req: RequestAuthorized, res: Response): Promise<Response> {
-        const result = await this.userService.registerCourse(Object.assign(req.body, { userId: req.user?.id }));
+        const result = await this.userService.registerCourse(Object.assign(req.body));
         return res.status(result.status).json(result);
     }
 

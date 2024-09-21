@@ -17,6 +17,10 @@ export class CourseRegisterRepository extends BaseRepository {
         return await courseRegisterSchema.findById(id);
     }
 
+    public async getByUserId(userId: string): Promise<ICourseRegisteringEntity[] | null> {
+        return await courseRegisterSchema.find({ user: userId });
+    }
+
     public async getMetadataQuery(
         options: TypeOptionUpdateRecord<ICourseRegisteringEntity>,
     ): Promise<ICourseRegisteringEntity | null> {

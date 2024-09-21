@@ -72,7 +72,7 @@ export class UserService {
     public async registerCourse(payload: IPayloadUserRegisterCourse): Promise<IResponseServer> {
         try {
             const courseRegisterRecord = await this.courseRegisterRepository.getMetadataQuery({
-                updateCondition: { user: payload.userId, course: { $in: payload.courseIds } },
+                updateCondition: { user: payload.userId, $and: [{ course: { $in: payload.courseIds } }] },
                 updateQuery: {},
             });
             if (courseRegisterRecord)
@@ -102,7 +102,7 @@ export class UserService {
             const userRecordUpdated = await this.userRepository.updateRecord({
                 updateCondition: { _id: payload.userId },
                 updateQuery: {
-                    $addToSet: { coursesRegistering: { $each: courseIds } },
+                    $addToSet: { coursesRegistering: { $each: newRecords.map((record) => record.id) } },
                 },
             });
             return new ResponseHandler(201, true, 'Create new course register successfully', userRecordUpdated);
@@ -138,7 +138,11 @@ export class UserService {
                 updateCondition: { _id: payload.userId },
                 updateQuery: {
                     $addToSet: { courses: userCourseIds },
-                    $pull: { coursesRegistering: { $in: userCourseIds } },
+                    $pull: {
+                        coursesRegistering: {
+                            $in: courseRegisterRecord.map((record) => record.id || (record as any)._id),
+                        },
+                    },
                 },
             });
             if (!userUpdated) return new ResponseHandler(500, false, 'Can not accept course for this user', null);
