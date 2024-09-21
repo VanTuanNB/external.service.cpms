@@ -97,16 +97,16 @@ export class AdmissionsService {
         }
     }
 
-    public async upgradeToStudent(admissionIds: string[]): Promise<IResponseServer> {
+    public async upgradeToStudent(payload: { admissionIds: string[] }): Promise<IResponseServer> {
         try {
             const newsRecords = await this.admissionsRepository.getMetadataManyRecordQuery({
                 updateCondition: {
-                    _id: { $in: admissionIds },
+                    _id: { $in: payload.admissionIds },
                 },
                 updateQuery: {},
             });
             if (!newsRecords || !newsRecords.length) {
-                return new ResponseHandler(404, true, `Admissions with id ${admissionIds} not found`, null);
+                return new ResponseHandler(404, true, `Admissions with id ${payload.admissionIds} not found`, null);
             }
             const userRole = await this.roleRepository.getUserRoleRecord();
             if (!userRole) return ResponseHandler.InternalServer();

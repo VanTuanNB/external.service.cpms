@@ -45,7 +45,7 @@ export default class AdmissionsController {
 
     @Required(GetInfoAdmissionsFilterModel, EModePayload.PARAMS)
     public async permanentlyDelete(req: Request, res: Response): Promise<Response> {
-        const result = await this.admissionsService.permanentlyDelete(req.body);
+        const result = await this.admissionsService.permanentlyDelete(req.params.id);
         return res.status(result.status).json(result);
     }
 }
