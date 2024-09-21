@@ -11,7 +11,7 @@ import rootRouter from '@/routes/index.route';
 
 const app = express();
 const port: number = Number(process.env.PORT) || 5000;
-const whitelist = ['http://localhost:3000', 'https://service-cpms.vercel.app'];
+const whitelist = ['http://localhost:3000', 'http://localhost:5173', 'https://service-cpms.vercel.app'];
 app.use(
     cors((req, callback) => {
         const corsOptions = { origin: false };
