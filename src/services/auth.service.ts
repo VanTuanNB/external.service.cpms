@@ -48,6 +48,7 @@ export class AuthService {
             const newAccount = await this.userRepository.create(newUser);
             if (!newAccount) return new ResponseHandler(500, false, 'Can not create new account', null);
             return new ResponseHandler(201, true, 'Create new un verify account successfully', {
+                userId: newUser.id,
                 accessToken,
                 refreshToken,
             });
@@ -90,6 +91,7 @@ export class AuthService {
             const updatedUser = await this.userRepository.update(Object.assign(user, { refreshToken }));
             if (!updatedUser) ResponseHandler.InternalServer();
             return new ResponseHandler(200, true, 'Login successfully', {
+                userId: user.id,
                 accessToken,
                 refreshToken,
             });
