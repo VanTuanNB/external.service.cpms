@@ -23,6 +23,7 @@ export class CourseRequirementRepository extends BaseRepository {
                 model: 'courses',
                 select: 'title code quantity description durationStart durationEnd createdAt updatedAt',
                 transform: (doc) => {
+                    if (!doc) return null;
                     const { _id, ...restOfProperties } = doc.toObject();
                     return { id: _id, ...restOfProperties };
                 },
@@ -38,6 +39,7 @@ export class CourseRequirementRepository extends BaseRepository {
             model: 'courses',
             select: 'title code quantity description durationStart durationEnd createdAt updatedAt',
             transform: (doc) => {
+                if (!doc) return null;
                 const { _id, ...restOfProperties } = doc.toObject();
                 return { id: _id, ...restOfProperties };
             },

@@ -24,6 +24,7 @@ export class CourseRepository extends BaseRepository {
                 model: 'faculties',
                 select: 'title code description durationStart durationEnd createdAt updatedAt',
                 transform: (doc) => {
+                    if (!doc) return null;
                     const { _id, ...restOfProperties } = doc.toObject();
                     return { id: _id, ...restOfProperties };
                 },
@@ -33,6 +34,7 @@ export class CourseRepository extends BaseRepository {
                 model: 'course-requirements',
                 select: 'title code description createdAt updatedAt',
                 transform: (doc) => {
+                    if (!doc) return null;
                     const { _id, ...restOfProperties } = doc.toObject();
                     return { id: _id, ...restOfProperties };
                 },
@@ -50,6 +52,7 @@ export class CourseRepository extends BaseRepository {
                 model: 'faculties',
                 select: 'title code description durationStart durationEnd createdAt updatedAt',
                 transform: (doc) => {
+                    if (!doc) return null;
                     const { _id, ...restOfProperties } = doc.toObject();
                     return { id: _id, ...restOfProperties };
                 },
@@ -59,6 +62,7 @@ export class CourseRepository extends BaseRepository {
                 model: 'course-requirements',
                 select: 'title code description createdAt updatedAt',
                 transform: (doc) => {
+                    if (!doc) return null;
                     const { _id, ...restOfProperties } = doc.toObject();
                     return { id: _id, ...restOfProperties };
                 },

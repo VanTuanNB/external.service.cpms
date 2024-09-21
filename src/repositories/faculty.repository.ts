@@ -24,6 +24,7 @@ export class FacultyRepository extends BaseRepository {
                 model: 'courses',
                 select: 'title code description durationStart quantity durationEnd createdAt updatedAt',
                 transform: (doc) => {
+                    if (!doc) return null;
                     const { _id, ...restOfProperties } = doc.toObject();
                     return { id: _id, ...restOfProperties };
                 },
@@ -39,6 +40,7 @@ export class FacultyRepository extends BaseRepository {
             model: 'courses',
             select: 'title code description durationStart quantity durationEnd createdAt updatedAt',
             transform: (doc) => {
+                if (!doc) return null;
                 const { _id, ...restOfProperties } = doc.toObject();
                 return { id: _id, ...restOfProperties };
             },
