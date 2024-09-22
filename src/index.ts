@@ -13,7 +13,7 @@ const app = express();
 const port: number = Number(process.env.PORT) || 5000;
 const whitelist = [
     'http://localhost:3000',
-    'https://external-portal-client-cpms.vercel.app/',
+    'https://external-portal-client-cpms.vercel.app',
     'https://external-portal-admin-cpms.vercel.app',
     'http://localhost:5173',
     'https://service-cpms.vercel.app',
