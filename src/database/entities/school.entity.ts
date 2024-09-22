@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString, IsUrl, IsUUID } from 'class-validator';
 
 export interface ISchoolEntity {
     id: string;
@@ -38,7 +38,7 @@ export class SchoolModel implements ISchoolEntity {
     @IsNotEmpty()
     phone: string;
 
-    @IsNumber()
+    @IsUrl()
     @IsOptional()
     logoUrl?: string;
 
@@ -61,6 +61,7 @@ export class SchoolModel implements ISchoolEntity {
         this.address = params.address;
         this.phone = params.phone;
         this.email = params.email;
+        this.logoUrl = params.logoUrl;
         this.description = params.description;
         this.createdAt = params.createdAt;
         this.updatedAt = params.updatedAt;

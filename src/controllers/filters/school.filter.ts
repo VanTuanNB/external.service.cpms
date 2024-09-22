@@ -1,5 +1,5 @@
 import type { ISchoolEntity } from '@/database/entities/school.entity';
-import { IsEmail, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsOptional, IsString, IsUrl } from 'class-validator';
 
 export class GetInfoSchoolFilterModel implements Partial<ISchoolEntity> {
     @IsString()
@@ -36,7 +36,7 @@ export class CreateSchoolFilterModel implements Partial<ISchoolEntity> {
     @IsOptional()
     description?: string;
 
-    @IsString()
+    @IsUrl()
     @IsOptional()
     logoUrl?: string;
 

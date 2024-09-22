@@ -62,8 +62,8 @@ export class SchoolService {
     public async update(payload: Omit<ISchoolEntity, 'createdAt' | 'updatedAt'>): Promise<IResponseServer> {
         try {
             const schoolRecord = await this.schoolRepository.getByCode(payload.code);
-            if (schoolRecord) {
-                return new ResponseHandler(200, true, 'School is exits', schoolRecord);
+            if (!schoolRecord) {
+                return new ResponseHandler(200, true, 'School not is exits', schoolRecord);
             }
             const newSchool = new SchoolModel({
                 id: payload.id,
