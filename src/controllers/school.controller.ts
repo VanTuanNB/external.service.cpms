@@ -29,7 +29,7 @@ export default class SchoolController {
     @Required(GetInfoSchoolFilterModel, EModePayload.PARAMS)
     @Required(CreateSchoolFilterModel)
     public async update(req: Request, res: Response): Promise<Response> {
-        const result = await this.schoolService.update(req.body);
+        const result = await this.schoolService.update(Object.assign(req.body, { id: req.params.id }));
         return res.status(result.status).json(result);
     }
 }
